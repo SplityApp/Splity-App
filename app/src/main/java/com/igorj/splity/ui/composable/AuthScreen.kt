@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.igorj.splity.model.AuthNavigationScreen
+import com.igorj.splity.ui.composable.auth.forgot_password.ForgotPasswordScreen
 import com.igorj.splity.ui.composable.auth.sign_in.SignInScreen
 import com.igorj.splity.ui.composable.auth.sign_up.SignUpScreen
 import com.igorj.splity.ui.theme.SplityTheme
@@ -46,7 +47,12 @@ fun AuthScreen(modifier: Modifier = Modifier) {
             )
         }
         composable(AuthNavigationScreen.ForgotPassword.name) {
-//            ForgotPasswordScreen()
+            ForgotPasswordScreen(
+                modifier = Modifier.fillMaxSize(),
+                onNavigate = {
+                    navController.navigate(it)
+                }
+            )
         }
     }
 }

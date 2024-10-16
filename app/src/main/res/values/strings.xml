@@ -21,4 +21,11 @@
     <string name="signInScreen_ui_confirmButton">Sign in</string>
     <string name="signInScreen_ui_bottomAlternativeText">Don\'t have an account?</string>
     <string name="signInScreen_ui_bottomAlternativeHighlightText">Sign up</string>
+
+    <string name="forgotPasswordScreen_ui_topLabel">Forgot password?</string>
+    <string name="forgotPasswordScreen_ui_descriptionLabel">To reset your password, provide your email address you used to sign up.</string>
+    <string name="forgotPasswordScreen_ui_emailTextFieldLabel">Email</string>
+    <string name="forgotPasswordScreen_ui_confirmButton">Send</string>
+    <string name="forgotPasswordScreen_ui_bottomAlternativeText">You just remembered your password?</string>
+    <string name="forgotPasswordScreen_ui_bottomAlternativeHighlightText">Sign in</string>
 </resources>

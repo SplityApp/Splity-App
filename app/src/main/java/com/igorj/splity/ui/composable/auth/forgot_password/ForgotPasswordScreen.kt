@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable.auth.sign_in
+package com.igorj.splity.ui.composable.auth.forgot_password
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,18 +16,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.R
 import com.igorj.splity.model.AuthNavigationScreen
-import com.igorj.splity.model.SignInState
 import com.igorj.splity.ui.composable.AuthBottomOptions
 import com.igorj.splity.ui.composable.AuthTopBar
 import com.igorj.splity.ui.theme.localColorScheme
 
 @Composable
-fun SignInScreen(
+fun ForgotPasswordScreen(
     modifier: Modifier = Modifier,
     onNavigate: (String) -> Unit = {}
 ) {
-    var signInState by remember {
-        mutableStateOf(SignInState())
+    var email by remember {
+        mutableStateOf("")
     }
 
     Scaffold(
@@ -43,17 +42,10 @@ fun SignInScreen(
                     .padding(it),
                 contentAlignment = Alignment.Center
             ) {
-                SignInForm(
-                    email = signInState.email,
-                    password = signInState.password,
-                    onEmailChanged = {  email ->
-                        signInState = signInState.copy(email = email)
-                    },
-                    onPasswordChanged = { password ->
-                        signInState = signInState.copy(password = password)
-                    },
-                    onForgotPasswordClicked = {
-                        onNavigate(AuthNavigationScreen.ForgotPassword.name)
+                ForgotPasswordForm(
+                    email = email,
+                    onEmailChanged = {
+                        email = it
                     }
                 )
             }
@@ -64,14 +56,14 @@ fun SignInScreen(
                     top = 32.dp,
                     bottom = 16.dp
                 ),
-                confirmText = stringResource(id = R.string.signInScreen_ui_confirmButton),
-                alternativeText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeText),
-                alternativeHighlightText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeHighlightText),
+                confirmText = stringResource(id = R.string.forgotPasswordScreen_ui_confirmButton),
+                alternativeText = stringResource(id = R.string.forgotPasswordScreen_ui_bottomAlternativeText),
+                alternativeHighlightText = stringResource(id = R.string.forgotPasswordScreen_ui_bottomAlternativeHighlightText),
                 onConfirmClicked = {
 
                 },
                 onAlternativeClicked = {
-                    onNavigate(AuthNavigationScreen.SignUp.name)
+                    onNavigate(AuthNavigationScreen.SignIn.name)
                 }
             )
         }
@@ -80,6 +72,6 @@ fun SignInScreen(
 
 @Preview
 @Composable
-private fun SignInScreenPreview() {
-    SignInScreen()
+private fun ForgotPasswordScreenPreview() {
+    ForgotPasswordScreen()
 }
