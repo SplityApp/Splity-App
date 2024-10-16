@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Splity</string>
+
+    <string name="authScreen_alt_hidePasswordButton">Hide password</string>
+    <string name="authScreen_alt_showPasswordButton">Show password</string>
+
+    <string name="signUpScreen_ui_topLabel">Sign up</string>
+    <string name="signUpScreen_ui_usernameTextFieldLabel">Username</string>
+    <string name="signUpScreen_ui_emailTextFieldLabel">Email</string>
+    <string name="signUpScreen_ui_phoneNumberTextFieldLabel">Phone number</string>
+    <string name="signUpScreen_ui_passwordTextFieldLabel">Password</string>
+    <string name="signUpScreen_ui_repeatPasswordTextFieldLabel">Repeat password</string>
+    <string name="signUpScreen_ui_confirmButton">Sign up</string>
+    <string name="signUpScreen_ui_bottomAlternativeText">Already have an account?</string>
+    <string name="signUpScreen_ui_bottomAlternativeHighlightText">Sign in</string>
+
+    <string name="signInScreen_ui_topLabel">Sign in</string>
+    <string name="signInScreen_ui_emailTextFieldLabel">Email</string>
+    <string name="signInScreen_ui_passwordTextFieldLabel">Password</string>
+    <string name="signInScreen_ui_forgotPasswordTextButton">Forgot password?</string>
+    <string name="signInScreen_ui_confirmButton">Sign in</string>
+    <string name="signInScreen_ui_bottomAlternativeText">Don\'t have an account?</string>
+    <string name="signInScreen_ui_bottomAlternativeHighlightText">Sign up</string>
 </resources>

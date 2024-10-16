@@ -16,7 +16,7 @@ import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 
 @Composable
-fun AuthenticationTopBar(modifier: Modifier = Modifier) {
+fun AuthTopBar(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -33,6 +33,6 @@ fun AuthenticationTopBar(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun AuthenticationTopBarPreview() {
-    AuthenticationTopBar()
+private fun AuthTopBarPreview() {
+    AuthTopBar()
 }
