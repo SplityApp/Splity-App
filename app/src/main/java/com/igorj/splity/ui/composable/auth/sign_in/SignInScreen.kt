@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.R
+import com.igorj.splity.model.AuthNavigationScreen
 import com.igorj.splity.model.SignInState
 import com.igorj.splity.ui.composable.AuthBottomOptions
 import com.igorj.splity.ui.composable.AuthTopBar
@@ -51,6 +52,9 @@ fun SignInScreen(
                     onPasswordChanged = { password ->
                         signInState = signInState.copy(password = password)
                     },
+                    onForgotPasswordClicked = {
+//                        onNavigate(AuthNavigationScreen.ForgotPassword.name)
+                    }
                 )
             }
         },
@@ -63,6 +67,12 @@ fun SignInScreen(
                 confirmText = stringResource(id = R.string.signInScreen_ui_confirmButton),
                 alternativeText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeText),
                 alternativeHighlightText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeHighlightText),
+                onConfirmClicked = {
+
+                },
+                onAlternativeClicked = {
+                    onNavigate(AuthNavigationScreen.SignUp.name)
+                }
             )
         }
     )

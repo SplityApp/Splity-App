@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.R
+import com.igorj.splity.model.AuthNavigationScreen
 import com.igorj.splity.model.SignUpFormCallbacks
 import com.igorj.splity.model.SignUpState
 import com.igorj.splity.ui.composable.AuthBottomOptions
@@ -24,6 +25,7 @@ import com.igorj.splity.ui.theme.localColorScheme
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
+    onNavigate: (String) -> Unit = {}
 ) {
     var signUpState by remember {
         mutableStateOf(SignUpState())
@@ -73,6 +75,12 @@ fun SignUpScreen(
                 confirmText = stringResource(id = R.string.signUpScreen_ui_confirmButton),
                 alternativeText = stringResource(id = R.string.signUpScreen_ui_bottomAlternativeText),
                 alternativeHighlightText = stringResource(id = R.string.signUpScreen_ui_bottomAlternativeHighlightText),
+                onConfirmClicked = {
+
+                },
+                onAlternativeClicked = {
+                    onNavigate(AuthNavigationScreen.SignIn.name)
+                }
             )
         }
     )

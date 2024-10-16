@@ -1,5 +1,7 @@
 package com.igorj.splity.ui.composable
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,14 +21,28 @@ fun AuthScreen(modifier: Modifier = Modifier) {
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = AuthNavigationScreen.SignIn.name
+        startDestination = AuthNavigationScreen.SignIn.name,
+        enterTransition = {
+            EnterTransition.None
+        },
+        exitTransition = {
+            ExitTransition.None
+        }
     ) {
         composable(AuthNavigationScreen.SignIn.name) {
-            SignInScreen()
+            SignInScreen(
+                modifier = Modifier.fillMaxSize(),
+                onNavigate = {
+                    navController.navigate(it)
+                }
+            )
         }
         composable(AuthNavigationScreen.SignUp.name) {
             SignUpScreen(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                onNavigate = {
+                    navController.navigate(it)
+                }
             )
         }
         composable(AuthNavigationScreen.ForgotPassword.name) {
