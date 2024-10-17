@@ -53,8 +53,7 @@ fun ForgotPasswordScreen(
         bottomBar = {
             AuthBottomOptions(
                 modifier = Modifier.padding(
-                    top = 32.dp,
-                    bottom = 16.dp
+                    vertical = 20.dp
                 ),
                 confirmText = stringResource(id = R.string.forgotPasswordScreen_ui_confirmButton),
                 alternativeText = stringResource(id = R.string.forgotPasswordScreen_ui_bottomAlternativeText),

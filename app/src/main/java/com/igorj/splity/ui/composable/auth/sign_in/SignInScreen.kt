@@ -61,8 +61,7 @@ fun SignInScreen(
         bottomBar = {
             AuthBottomOptions(
                 modifier = Modifier.padding(
-                    top = 32.dp,
-                    bottom = 16.dp
+                    vertical = 20.dp
                 ),
                 confirmText = stringResource(id = R.string.signInScreen_ui_confirmButton),
                 alternativeText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeText),
