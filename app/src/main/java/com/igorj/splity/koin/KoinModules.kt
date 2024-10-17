@@ -2,8 +2,8 @@ package com.igorj.splity.koin
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.igorj.splity.AuthViewModel
 import com.igorj.splity.api.AuthApi
-import com.igorj.splity.ui.composable.AuthViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
 import okhttp3.Interceptor
@@ -46,5 +46,5 @@ val appModule = module {
     single { get<Retrofit>().create(AuthApi::class.java) }
 }
 
-const val TOKEN_MANAGER_SHARED_PREFERENCES = "token_manager_shared_preferences"
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"
+const val TOKEN_MANAGER_SHARED_PREFERENCES = "token_manager_shared_preferences"

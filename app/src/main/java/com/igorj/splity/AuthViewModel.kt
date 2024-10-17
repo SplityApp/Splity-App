@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable
+package com.igorj.splity
 
 import android.util.Log
 import android.util.Patterns
