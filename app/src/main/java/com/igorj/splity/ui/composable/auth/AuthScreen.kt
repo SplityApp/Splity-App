@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable
+package com.igorj.splity.ui.composable.auth
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -8,7 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.igorj.splity.model.AuthNavigationScreen
+import com.igorj.splity.model.auth.AuthNavigationScreen
+import com.igorj.splity.ui.composable.AuthViewModel
 import com.igorj.splity.ui.composable.auth.forgot_password.ForgotPasswordScreen
 import com.igorj.splity.ui.composable.auth.sign_in.SignInScreen
 import com.igorj.splity.ui.composable.auth.sign_up.SignUpScreen

@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable
+package com.igorj.splity.ui.composable.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

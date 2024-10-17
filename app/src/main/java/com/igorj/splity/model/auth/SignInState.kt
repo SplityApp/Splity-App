@@ -1,4 +1,4 @@
-package com.igorj.splity.model
+package com.igorj.splity.model.auth
 
 import androidx.compose.runtime.Stable
 

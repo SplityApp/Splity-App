@@ -15,10 +15,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.R
-import com.igorj.splity.model.AuthNavigationScreen
-import com.igorj.splity.model.SignInState
-import com.igorj.splity.ui.composable.AuthBottomOptions
-import com.igorj.splity.ui.composable.AuthTopBar
+import com.igorj.splity.model.auth.AuthNavigationScreen
+import com.igorj.splity.model.auth.SignInState
+import com.igorj.splity.ui.composable.auth.AuthBottomOptions
+import com.igorj.splity.ui.composable.auth.AuthTopBar
 import com.igorj.splity.ui.theme.localColorScheme
 
 @Composable

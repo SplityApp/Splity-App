@@ -5,10 +5,10 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.AuthApi
-import com.igorj.splity.model.SignUpState
 import com.igorj.splity.model.auth.AuthLoginRequest
 import com.igorj.splity.model.auth.AuthRegisterRequest
 import com.igorj.splity.model.auth.AuthState
+import com.igorj.splity.model.auth.SignUpState
 import com.igorj.splity.util.auth.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

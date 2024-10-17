@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.toArgb
@@ -26,23 +25,7 @@ private val darkColorScheme = darkColorScheme(
     background = Black,
 )
 
-private val lightColorScheme = lightColorScheme(
-    primary = Green,
-    secondary = White,
-    secondaryContainer = DarkGrey,
-    tertiary = LightGrey,
-    background = LightGrey,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+private val lightColorScheme = darkColorScheme
 
 val localColorScheme: ColorScheme
     @Composable get() = LocalColorSchemeProvider.current.colorScheme(LocalContext.current)
@@ -76,11 +59,11 @@ fun SplityTheme(
     )
 }
 
-internal interface ColorSchemeProvider {
+private interface ColorSchemeProvider {
     fun colorScheme(context: Context): ColorScheme
 }
 
-internal val LocalColorSchemeProvider = staticCompositionLocalOf<ColorSchemeProvider> {
+private val LocalColorSchemeProvider = staticCompositionLocalOf<ColorSchemeProvider> {
     object : ColorSchemeProvider {
         override fun colorScheme(context: Context): ColorScheme {
             return currentColorScheme(context)
@@ -88,11 +71,11 @@ internal val LocalColorSchemeProvider = staticCompositionLocalOf<ColorSchemeProv
     }
 }
 
-fun isDarkMode(context: Context): Boolean {
+private fun isDarkMode(context: Context): Boolean {
     return (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }
 
-fun currentColorScheme(context: Context): ColorScheme {
+private fun currentColorScheme(context: Context): ColorScheme {
     return if (isDarkMode(context)) {
         darkColorScheme
     } else {

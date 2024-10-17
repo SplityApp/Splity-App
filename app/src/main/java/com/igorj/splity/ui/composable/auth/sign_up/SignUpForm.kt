@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.igorj.splity.R
-import com.igorj.splity.model.SignUpFormCallbacks
-import com.igorj.splity.model.SignUpState
+import com.igorj.splity.model.auth.SignUpFormCallbacks
+import com.igorj.splity.model.auth.SignUpState
 import com.igorj.splity.model.TextFieldType
 import com.igorj.splity.ui.composable.TextField
 import com.igorj.splity.ui.theme.localColorScheme

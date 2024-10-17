@@ -13,8 +13,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.igorj.splity.model.auth.AuthState
-import com.igorj.splity.ui.composable.AuthScreen
 import com.igorj.splity.ui.composable.AuthViewModel
+import com.igorj.splity.ui.composable.auth.AuthScreen
 import com.igorj.splity.ui.theme.SplityTheme
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography

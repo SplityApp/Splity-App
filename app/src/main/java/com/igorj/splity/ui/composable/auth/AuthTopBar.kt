@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable
+package com.igorj.splity.ui.composable.auth
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
