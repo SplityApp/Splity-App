@@ -25,6 +25,7 @@ import com.igorj.splity.ui.theme.localColorScheme
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
+    onSignUpClicked: (SignUpState) -> Unit,
     onNavigate: (String) -> Unit = {}
 ) {
     var signUpState by remember {
@@ -75,7 +76,7 @@ fun SignUpScreen(
                 alternativeText = stringResource(id = R.string.signUpScreen_ui_bottomAlternativeText),
                 alternativeHighlightText = stringResource(id = R.string.signUpScreen_ui_bottomAlternativeHighlightText),
                 onConfirmClicked = {
-
+                    onSignUpClicked(signUpState)
                 },
                 onAlternativeClicked = {
                     onNavigate(AuthNavigationScreen.SignIn.name)
@@ -88,5 +89,7 @@ fun SignUpScreen(
 @Preview
 @Composable
 private fun SignUpScreenPreview() {
-    SignUpScreen()
+    SignUpScreen(
+        onSignUpClicked = {}
+    )
 }

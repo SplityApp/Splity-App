@@ -107,9 +107,9 @@ fun TextField(
             )
             if (isPassword) {
                 val (icon, contentDescription) = if (isPasswordHintVisible) {
-                    R.drawable.ic_closed_eye to R.string.authScreen_alt_hidePasswordButton
+                    R.drawable.ic_eye to R.string.authScreen_alt_hidePasswordButton
                 } else {
-                    R.drawable.ic_eye to R.string.authScreen_alt_showPasswordButton
+                    R.drawable.ic_closed_eye to R.string.authScreen_alt_showPasswordButton
                 }
 
                 IconButton(

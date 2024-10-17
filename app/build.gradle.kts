@@ -69,4 +69,11 @@ dependencies {
 
     // rememberNavController
     implementation("androidx.navigation:navigation-compose:2.8.3")
+
+    // Koin
+    implementation("io.insert-koin:koin-android:4.0.0-RC2")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

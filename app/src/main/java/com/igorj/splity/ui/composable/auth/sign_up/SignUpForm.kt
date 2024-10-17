@@ -91,7 +91,7 @@ fun SignUpForm(
                     focusManager.moveFocus(FocusDirection.Next)
                 },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 )
             )

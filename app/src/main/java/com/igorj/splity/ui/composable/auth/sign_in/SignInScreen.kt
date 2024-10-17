@@ -24,6 +24,7 @@ import com.igorj.splity.ui.theme.localColorScheme
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
+    onSignInClicked: (String, String) -> Unit,
     onNavigate: (String) -> Unit = {}
 ) {
     var signInState by remember {
@@ -46,7 +47,7 @@ fun SignInScreen(
                 SignInForm(
                     email = signInState.email,
                     password = signInState.password,
-                    onEmailChanged = {  email ->
+                    onEmailChanged = { email ->
                         signInState = signInState.copy(email = email)
                     },
                     onPasswordChanged = { password ->
@@ -67,7 +68,7 @@ fun SignInScreen(
                 alternativeText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeText),
                 alternativeHighlightText = stringResource(id = R.string.signInScreen_ui_bottomAlternativeHighlightText),
                 onConfirmClicked = {
-
+                    onSignInClicked(signInState.email, signInState.password)
                 },
                 onAlternativeClicked = {
                     onNavigate(AuthNavigationScreen.SignUp.name)
@@ -80,5 +81,7 @@ fun SignInScreen(
 @Preview
 @Composable
 private fun SignInScreenPreview() {
-    SignInScreen()
+    SignInScreen(
+        onSignInClicked = { _, _ -> }
+    )
 }
