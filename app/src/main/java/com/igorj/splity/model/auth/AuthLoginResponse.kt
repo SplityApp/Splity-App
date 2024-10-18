@@ -1,6 +1,5 @@
 package com.igorj.splity.model.auth
 
 data class AuthLoginResponse(
-    val token: String,
-    val user: User
+    val token: String
 )
