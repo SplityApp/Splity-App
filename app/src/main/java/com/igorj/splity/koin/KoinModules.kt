@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.igorj.splity.AuthViewModel
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.HomeApi
+import com.igorj.splity.ui.composable.main.home.HomeViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
 import okhttp3.Interceptor
@@ -18,6 +20,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 val appModule = module {
     viewModel {
         AuthViewModel(get(), get())
+    }
+
+    viewModel {
+        HomeViewModel(get())
     }
 
     single<SharedPreferences>(named(TOKEN_MANAGER_SHARED_PREFERENCES)){
@@ -44,6 +50,8 @@ val appModule = module {
     }
 
     single { get<Retrofit>().create(AuthApi::class.java) }
+
+    single { get<Retrofit>().create(HomeApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"
