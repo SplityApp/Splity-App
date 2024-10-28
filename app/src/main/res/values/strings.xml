@@ -32,4 +32,7 @@
     <string name="bottomNavBar_alt_homeLabel">Home</string>
     <string name="bottomNavBar_alt_statsLabel">Stats</string>
     <string name="bottomNavBar_alt_profileLabel">Profile</string>
+
+    <string name="homeScreen_ui_topLabel">Current expenses</string>
+    <string name="homeScreen_ui_errorLabel">An error occurred</string>
 </resources>

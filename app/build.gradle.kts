@@ -72,6 +72,7 @@ dependencies {
 
     // Koin
     implementation("io.insert-koin:koin-android:4.0.0-RC2")
+    implementation("io.insert-koin:koin-androidx-compose-navigation:4.0.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -79,4 +80,7 @@ dependencies {
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended:1.7.4")
+
+    // Pull to refresh
+    implementation("androidx.compose.material:material:1.7.4")
 }
