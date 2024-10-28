@@ -29,7 +29,7 @@
     <string name="forgotPasswordScreen_ui_bottomAlternativeText">You just remembered your password?</string>
     <string name="forgotPasswordScreen_ui_bottomAlternativeHighlightText">Sign in</string>
     
-    <string name="home"> Home </string>
-    <string name="stats"> Stats </string>
-    <string name="profile"> Profile </string>
+    <string name="bottomNavBar_alt_homeLabel">Home</string>
+    <string name="bottomNavBar_alt_statsLabel">Stats</string>
+    <string name="bottomNavBar_alt_profileLabel">Profile</string>
 </resources>
