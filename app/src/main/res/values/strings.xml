@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Splity</string>
 
-    <string name="authScreen_alt_hidePasswordButton">Hide password</string>
-    <string name="authScreen_alt_showPasswordButton">Show password</string>
+    <string name="textField_alt_hidePasswordButton">Hide password</string>
+    <string name="textField_alt_showPasswordButton">Show password</string>
+    <string name="textField_alt_showPasswordButton_testTag">password_eye_button</string>
+
+    <string name="authBottomOptions_ui_textButton_testTag">auth_text_button</string>
+    <string name="authBottomOptions_ui_confirmButton_testTag">auth_confirm_button</string>
 
     <string name="signUpScreen_ui_topLabel">Sign up</string>
     <string name="signUpScreen_ui_usernameTextFieldLabel">Username</string>
@@ -14,6 +18,8 @@
     <string name="signUpScreen_ui_bottomAlternativeText">Already have an account?</string>
     <string name="signUpScreen_ui_bottomAlternativeHighlightText">Sign in</string>
 
+    <string name="signUpForm_ui_topLabel_testTag">sign_up_top_label</string>
+
     <string name="signInScreen_ui_topLabel">Sign in</string>
     <string name="signInScreen_ui_emailTextFieldLabel">Email</string>
     <string name="signInScreen_ui_passwordTextFieldLabel">Password</string>
@@ -21,6 +27,8 @@
     <string name="signInScreen_ui_confirmButton">Sign in</string>
     <string name="signInScreen_ui_bottomAlternativeText">Don\'t have an account?</string>
     <string name="signInScreen_ui_bottomAlternativeHighlightText">Sign up</string>
+
+    <string name="signInForm_ui_topLabel_testTag">sign_in_top_label</string>
 
     <string name="forgotPasswordScreen_ui_topLabel">Forgot password?</string>
     <string name="forgotPasswordScreen_ui_descriptionLabel">To reset your password, provide your email address you used to sign up.</string>

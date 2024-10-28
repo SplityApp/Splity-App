@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -107,15 +108,18 @@ fun TextField(
             )
             if (isPassword) {
                 val (icon, contentDescription) = if (isPasswordHintVisible) {
-                    R.drawable.ic_eye to R.string.authScreen_alt_hidePasswordButton
+                    R.drawable.ic_eye to R.string.textField_alt_hidePasswordButton
                 } else {
-                    R.drawable.ic_closed_eye to R.string.authScreen_alt_showPasswordButton
+                    R.drawable.ic_closed_eye to R.string.textField_alt_showPasswordButton
                 }
 
                 IconButton(
                     onClick = {
                         isPasswordHintVisible = !isPasswordHintVisible
-                    }
+                    },
+                    modifier = Modifier.testTag(stringResource(
+                        id = R.string.textField_alt_showPasswordButton_testTag)
+                    )
                 ) {
                     Icon(
                         modifier = Modifier.size(32.dp),

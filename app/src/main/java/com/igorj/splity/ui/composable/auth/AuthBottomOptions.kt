@@ -13,12 +13,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.igorj.splity.R
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 
@@ -45,7 +48,10 @@ fun AuthBottomOptions(
             Button(
                 modifier = Modifier
                     .height(60.dp)
-                    .width(targetWidth),
+                    .width(targetWidth)
+                    .testTag(stringResource(
+                        id = R.string.authBottomOptions_ui_confirmButton_testTag)
+                    ),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = localColorScheme.primary,
                 ),
@@ -80,7 +86,9 @@ fun AuthBottomOptions(
         Text(
             modifier = Modifier.clickable {
                 onAlternativeClicked()
-            },
+            }.testTag(
+                    stringResource(id = R.string.authBottomOptions_ui_textButton_testTag)
+                ),
             text = annotatedText,
             style = typography.bodyMedium,
         )
