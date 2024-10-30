@@ -22,6 +22,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -58,7 +59,10 @@ fun SignInForm(
             style = typography.headlineLarge,
             color = localColorScheme.secondary,
             fontWeight = FontWeight.Normal,
-            letterSpacing = 0.3.sp
+            letterSpacing = 0.3.sp,
+            modifier = Modifier.testTag(stringResource(
+                id = R.string.signInForm_ui_topLabel_testTag)
+            )
         )
         Column(
             modifier = Modifier.padding(top = 16.dp),
