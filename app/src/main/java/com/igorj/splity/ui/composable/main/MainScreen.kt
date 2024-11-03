@@ -1,9 +1,11 @@
 package com.igorj.splity.ui.composable.main
 
 import BottomNavBar
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -18,8 +20,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.igorj.splity.model.main.BottomNavItem
+import com.igorj.splity.model.payment.PaymentParticipant
 import com.igorj.splity.ui.composable.main.home.HomeScreen
-import com.igorj.splity.ui.composable.main.profile.ProfileScreen
+import com.igorj.splity.ui.composable.main.payment.Payment
 
 @Composable
 fun MainScreen(
@@ -64,22 +67,32 @@ fun MainScreen(
                     }
                 }
                 composable(BottomNavItem.Profile.route) {
-                    ProfileScreen(
-                        onLogoutClicked = {
-                            onLogoutClicked()
-                        }
-                    )
+                    Column() {
+                        Payment(
+                            amount = 20.00,
+                            payer = PaymentParticipant(
+                                username = "Test Payer",
+                                phoneNumber = "123456789",
+                                email = "testpayer@mail.com",
+                            ),
+                            receiver = PaymentParticipant(
+                                username = "Test Receiver",
+                                phoneNumber = "987654321",
+                                email = "testreceiver@mail.com",
+                            )
+                        )
+                    }
                 }
             }
         },
         bottomBar = {
-             BottomNavBar(
-                 items = bottomNavBarItems,
-                 onNavigate = { route ->
-                     navController.navigate(route)
-                 },
-                 currentRoute = currentRoute
-             )
+            BottomNavBar(
+                items = bottomNavBarItems,
+                onNavigate = { route ->
+                    navController.navigate(route)
+                },
+                currentRoute = currentRoute
+            )
         }
     )
 }

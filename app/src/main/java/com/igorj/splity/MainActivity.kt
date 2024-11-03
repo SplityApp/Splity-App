@@ -1,7 +1,6 @@
 package com.igorj.splity
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.fragment.app.FragmentActivity
 import com.igorj.splity.model.auth.AuthState
 import com.igorj.splity.ui.composable.auth.AuthScreen
 import com.igorj.splity.ui.composable.main.MainScreen
@@ -28,7 +28,7 @@ import com.igorj.splity.util.SnackbarController
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private val authViewModel: AuthViewModel by viewModel()
 
