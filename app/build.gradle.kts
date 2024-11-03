@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -18,6 +20,14 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val keystoreFile = project.rootProject.file("local.properties")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+
+        buildConfigField("String", "TPAY_CLIENT_ID", "\"${properties["TPAY_CLIENT_ID"]}\"")
+        buildConfigField("String", "TPAY_CLIENT_SECRET", "\"${properties["TPAY_CLIENT_SECRET"]}\"")
+        buildConfigField("String", "TPAY_PUBLIC_KEY_HASH", "\"${properties["TPAY_PUBLIC_KEY_HASH"]}\"")
     }
 
     buildTypes {
@@ -38,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -83,4 +94,7 @@ dependencies {
 
     // Pull to refresh
     implementation("androidx.compose.material:material:1.7.4")
+    
+    //Tpay
+    implementation("com.tpay:sdk:1.2.1")
 }
