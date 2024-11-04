@@ -95,6 +95,6 @@ dependencies {
     // Pull to refresh
     implementation("androidx.compose.material:material:1.7.4")
     
-    //Tpay
+    // Tpay
     implementation("com.tpay:sdk:1.2.1")
 }

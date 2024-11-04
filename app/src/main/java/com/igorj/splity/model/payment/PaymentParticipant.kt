@@ -5,4 +5,3 @@ data class PaymentParticipant(
     val phoneNumber: String,
     val email: String
 )
-
