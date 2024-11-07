@@ -24,8 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.igorj.splity.R
 import com.igorj.splity.model.main.home.HomeState
+import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsScreen
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
@@ -43,7 +47,7 @@ fun HomeScreen(
     val userGroupsState by homeViewModel.userGroups.collectAsStateWithLifecycle()
     val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, { homeViewModel.getUserGroups() })
-
+    val navController = rememberNavController()
 
     when (val state = userGroupsState) {
         HomeState.Loading -> {
@@ -57,44 +61,60 @@ fun HomeScreen(
             }
         }
         is HomeState.Success -> {
-            Scaffold(
-                modifier = modifier.fillMaxSize(),
-                backgroundColor = localColorScheme.background,
-                topBar = {
-                    Text(
-                        text = stringResource(R.string.homeScreen_ui_topLabel),
-                        style = typography.headlineMedium,
-                        color = localColorScheme.secondary,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                },
-                content = { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                            .pullRefresh(pullRefreshState),
-                    ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(state.userGroups) { group ->
-                                HomeCard(
-                                    title = group.name,
-                                    amount = group.totalAmount,
-                                    currency = group.currency
+            NavHost(
+                navController = navController,
+                startDestination = "home"
+            ) {
+                composable("home") {
+                    Scaffold(
+                        modifier = modifier.fillMaxSize(),
+                        backgroundColor = localColorScheme.background,
+                        topBar = {
+                            Text(
+                                text = stringResource(R.string.homeScreen_ui_topLabel),
+                                style = typography.headlineMedium,
+                                color = localColorScheme.secondary,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        },
+                        content = { innerPadding ->
+                            Box(
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .fillMaxSize()
+                                    .pullRefresh(pullRefreshState),
+                            ) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    items(state.userGroups) { group ->
+                                        HomeCard(
+                                            title = group.name,
+                                            amount = group.myBalance,
+                                            currency = group.currency,
+                                            onClick = {
+                                                navController.navigate("groupDetails/${group.id}")
+                                            }
+                                        )
+                                    }
+                                }
+
+                                PullRefreshIndicator(
+                                    modifier = Modifier.align(Alignment.TopCenter),
+                                    refreshing = isRefreshing,
+                                    state = pullRefreshState
                                 )
                             }
                         }
-
-                        PullRefreshIndicator(
-                            modifier = Modifier.align(Alignment.TopCenter),
-                            refreshing = isRefreshing,
-                            state = pullRefreshState
-                        )
+                    )
+                }
+                composable("groupDetails/{groupId}") { backStackEntry ->
+                    val groupId = backStackEntry.arguments?.getString("groupId")
+                    groupId?.let {
+                        GroupDetailsScreen(groupId = it)
                     }
                 }
-            )
+            }
         }
         is HomeState.Error -> {
             Box(

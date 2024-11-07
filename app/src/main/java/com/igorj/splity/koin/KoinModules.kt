@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.igorj.splity.AuthViewModel
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
+import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsViewModel
 import com.igorj.splity.ui.composable.main.home.HomeViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
@@ -24,6 +26,10 @@ val appModule = module {
 
     viewModel {
         HomeViewModel(get())
+    }
+
+    viewModel {
+        GroupDetailsViewModel(get())
     }
 
     single<SharedPreferences>(named(TOKEN_MANAGER_SHARED_PREFERENCES)){
@@ -52,6 +58,8 @@ val appModule = module {
     single { get<Retrofit>().create(AuthApi::class.java) }
 
     single { get<Retrofit>().create(HomeApi::class.java) }
+
+    single { get<Retrofit>().create(GroupApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"
