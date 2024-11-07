@@ -23,6 +23,9 @@ import com.igorj.splity.model.main.groupDetails.GroupDetailsState
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -56,7 +59,7 @@ fun GroupDetailsScreen(
                 topBar = {
                     Text(
                         text = state.groupDetails.name,
-                        style = typography.headlineMedium,
+                        style = typography.headlineLarge,
                         color = localColorScheme.secondary,
                         modifier = Modifier.padding(16.dp)
                     )
@@ -68,14 +71,36 @@ fun GroupDetailsScreen(
                             .fillMaxSize()
                             .pullRefresh(pullRefreshState),
                     ) {
+                        val groupedExpenses = state.groupDetails.expenses
+                            .groupBy { expense ->
+                                val date = Date(expense.createdAt.time)
+                                SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(date)
+                            }
+                            .toSortedMap(reverseOrder())
+
                         LazyColumn(
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            items(state.groupDetails.expenses) { expense ->
-                                ExpenseCard(
-                                    expense = expense,
-                                    currency = state.groupDetails.currency
-                                )
+                            groupedExpenses.forEach { (date, expensesForDate) ->
+                                item {
+                                    Text(
+                                        text = date,
+                                        style = typography.titleMedium,
+                                        color = localColorScheme.secondary,
+                                        modifier = Modifier.padding(
+                                            start = 16.dp,
+                                            top = 16.dp,
+                                            bottom = 8.dp
+                                        )
+                                    )
+                                }
+
+                                items(expensesForDate) { expense ->
+                                    ExpenseCard(
+                                        expense = expense,
+                                        currency = state.groupDetails.currency
+                                    )
+                                }
                             }
                         }
 

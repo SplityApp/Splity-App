@@ -85,7 +85,8 @@ fun ExpenseCardPreview() {
             category = "Food",
             amount = 10.0,
             state = "Paid",
-            paidBy = "John Doe"
+            paidBy = "John Doe",
+            createdAt = java.sql.Timestamp(System.currentTimeMillis())
         ),
         currency = "USD"
     )
