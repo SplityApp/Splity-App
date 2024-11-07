@@ -67,7 +67,7 @@ fun ExpenseCard(
             }
 
             Text(
-                text = "${if (isAmountAnInt)  expense.amount.toInt() else "%.2f".format(expense.amount)} $currency",
+                text = "${if (isAmountAnInt) expense.amount.toInt() else "%.2f".format(expense.amount)} $currency",
                 style = typography.headlineMedium,
                 color = localColorScheme.secondary
             )
