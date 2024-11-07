@@ -125,7 +125,7 @@ fun HomeScreen(
                             items(state.userGroups) { group ->
                                 HomeCard(
                                     title = group.name,
-                                    amount = group.totalAmount,
+                                    amount = group.myBalance,
                                     currency = group.currency
                                 )
                             }
@@ -197,7 +197,7 @@ fun HomeScreen(
                                             .padding(top = 4.dp)
                                             .align(Alignment.End),
                                         onClick = {
-//                                            homeViewModel.createGroup(name, selectedCurrency)
+                                            homeViewModel.createGroup(name, selectedCurrency)
                                             showBottomSheet = false
                                         },
                                         colors = ButtonDefaults.buttonColors(
