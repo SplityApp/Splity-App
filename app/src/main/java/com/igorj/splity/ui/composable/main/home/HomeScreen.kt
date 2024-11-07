@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -51,8 +50,8 @@ import com.igorj.splity.R
 import com.igorj.splity.model.TextFieldType
 import com.igorj.splity.model.main.home.HomeState
 import com.igorj.splity.ui.composable.TextField
-import com.igorj.splity.ui.theme.DarkGrey
 import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsScreen
+import com.igorj.splity.ui.theme.DarkGrey
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
@@ -89,6 +88,7 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
         }
+
         is HomeState.Success -> {
             NavHost(
                 navController = navController,
@@ -99,20 +99,17 @@ fun HomeScreen(
                         modifier = modifier.fillMaxSize(),
                         backgroundColor = localColorScheme.background,
                         floatingActionButton = {
-                            ExtendedFloatingActionButton(
-                                text = {
-                                    Text("Show bottom sheet")
-                                },
-                                icon = {
-                                    Icon(
-                                        Icons.Filled.Add,
-                                        contentDescription = ""
-                                    )
-                                },
+                            FloatingActionButton(
+                                backgroundColor = localColorScheme.primary,
                                 onClick = {
                                     showBottomSheet = true
                                 }
-                            )
+                            ) {
+                                Icon(
+                                    Icons.Filled.Add,
+                                    contentDescription = ""
+                                )
+                            }
                         },
                         topBar = {
                             Text(
@@ -136,7 +133,10 @@ fun HomeScreen(
                                         HomeCard(
                                             title = group.name,
                                             amount = group.myBalance,
-                                            currency = group.currency
+                                            currency = group.currency,
+                                            onClick = {
+                                                navController.navigate("groupDetails/${group.id}")
+                                            }
                                         )
                                     }
                                 }
@@ -207,7 +207,10 @@ fun HomeScreen(
                                                     .padding(top = 4.dp)
                                                     .align(Alignment.End),
                                                 onClick = {
-                                                    homeViewModel.createGroup(name, selectedCurrency)
+                                                    homeViewModel.createGroup(
+                                                        name,
+                                                        selectedCurrency
+                                                    )
                                                     showBottomSheet = false
                                                 },
                                                 colors = ButtonDefaults.buttonColors(
