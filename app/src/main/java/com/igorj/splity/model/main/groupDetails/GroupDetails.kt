@@ -1,6 +1,7 @@
 package com.igorj.splity.model.main.groupDetails
 
 import com.google.gson.annotations.SerializedName
+import com.igorj.splity.model.main.expense.Expense
 import java.sql.Timestamp
 
 data class GroupDetails(

@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
-import com.igorj.splity.ui.composable.main.home.HomeCard
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
@@ -76,11 +75,9 @@ fun GroupDetailsScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(state.groupDetails.expenses) { expense ->
-                                HomeCard(
-                                    title = expense.description,
-                                    amount = expense.amount,
-                                    currency = state.groupDetails.currency,
-                                    onClick = {}
+                                ExpenseCard(
+                                    expense = expense,
+                                    currency = state.groupDetails.currency
                                 )
                             }
                         }

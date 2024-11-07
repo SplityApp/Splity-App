@@ -46,7 +46,7 @@ fun HomeCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-            onClick = onClick
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
