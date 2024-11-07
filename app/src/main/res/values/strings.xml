@@ -43,4 +43,8 @@
 
     <string name="homeScreen_ui_topLabel">Current expenses</string>
     <string name="homeScreen_ui_errorLabel">An error occurred</string>
+
+    <string name="createGroupModalBottomSheet_ui_newGroupTitle">New group</string>
+    <string name="createGroupModalBottomSheet_ui_newGroupTextFieldHint">Group name</string>
+    <string name="createGroupModalBottomSheet_ui_newGroupButtonLabel">Create</string>
 </resources>
