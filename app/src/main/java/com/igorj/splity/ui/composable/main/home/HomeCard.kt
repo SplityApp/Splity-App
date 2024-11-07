@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,11 +21,13 @@ import com.igorj.splity.ui.theme.Red
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeCard(
     title: String,
     amount: Double,
     currency: String,
+    onClick: () -> Unit
 ) {
     val amountColor: Color = if (amount > 0) {
         Green
@@ -42,8 +45,8 @@ fun HomeCard(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
@@ -73,5 +76,6 @@ fun HomeCardPreview() {
         title = "Japan weekend",
         amount = -25.54,
         currency = "zł",
+        onClick = {}
     )
 }
