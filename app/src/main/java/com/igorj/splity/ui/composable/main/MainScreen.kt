@@ -3,23 +3,26 @@ package com.igorj.splity.ui.composable.main
 import BottomNavBar
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.igorj.splity.model.main.BottomNavItem
+import com.igorj.splity.model.payment.PaymentParticipant
 import com.igorj.splity.ui.composable.main.home.HomeScreen
+import com.igorj.splity.ui.composable.main.payment.Payment
 import com.igorj.splity.ui.composable.main.profile.ProfileScreen
+import java.util.Currency
 
 @Composable
 fun MainScreen(
@@ -56,30 +59,40 @@ fun MainScreen(
                     HomeScreen()
                 }
                 composable(BottomNavItem.Stats.route) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(text = "Stats")
+                        Payment(
+                            amount = 20.00,
+                            payer = PaymentParticipant(
+                                username = "Test Payer",
+                                phoneNumber = "123456789",
+                                email = "testpayer@mail.com",
+                            ),
+                            receiver = PaymentParticipant(
+                                username = "Test Receiver",
+                                phoneNumber = "987654321",
+                                email = "testreceiver@mail.com",
+                            ),
+                            currency = Currency.getInstance("PLN")
+                        )
                     }
                 }
                 composable(BottomNavItem.Profile.route) {
                     ProfileScreen(
-                        onLogoutClicked = {
-                            onLogoutClicked()
-                        }
+                        onLogoutClicked = onLogoutClicked
                     )
                 }
             }
         },
         bottomBar = {
-             BottomNavBar(
-                 items = bottomNavBarItems,
-                 onNavigate = { route ->
-                     navController.navigate(route)
-                 },
-                 currentRoute = currentRoute
-             )
+            BottomNavBar(
+                items = bottomNavBarItems,
+                onNavigate = { route ->
+                    navController.navigate(route)
+                },
+                currentRoute = currentRoute
+            )
         }
     )
 }
