@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import com.igorj.splity.ui.composable.auth.AuthScreen
 import com.igorj.splity.ui.composable.main.MainScreen
 import com.igorj.splity.ui.theme.SplityTheme
 import com.igorj.splity.ui.theme.localColorScheme
+import com.igorj.splity.util.LoadingController
 import com.igorj.splity.util.ObserveAsEvents
 import com.igorj.splity.util.SnackbarController
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ class MainActivity : FragmentActivity() {
         setContent {
             SplityTheme {
                 val authState = authViewModel.authState.collectAsState()
-                val isLoading = authViewModel.isLoading.collectAsState()
+                val isLoading by LoadingController.isLoading.collectAsState()
                 
                 val snackbarHostState = remember {
                     SnackbarHostState() 
@@ -105,7 +107,7 @@ class MainActivity : FragmentActivity() {
                             }
                         }
 
-                        if (isLoading.value) {
+                        if (isLoading) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()

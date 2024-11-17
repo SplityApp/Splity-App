@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,22 +14,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,9 +53,9 @@ import com.igorj.splity.model.TextFieldType
 import com.igorj.splity.model.main.home.HomeState
 import com.igorj.splity.ui.composable.TextField
 import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsScreen
-import com.igorj.splity.ui.theme.DarkGrey
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
+import com.igorj.splity.util.LoadingController
 import org.koin.androidx.compose.koinViewModel
 import java.util.Currency
 import java.util.Locale
@@ -65,27 +67,31 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel()
 ) {
     LaunchedEffect(true) {
-        homeViewModel.getUserGroups()
+        homeViewModel.refreshUserGroups()
     }
 
     val userGroupsState by homeViewModel.userGroups.collectAsStateWithLifecycle()
     val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, { homeViewModel.getUserGroups() })
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { homeViewModel.refreshUserGroups() })
     val navController = rememberNavController()
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by rememberSaveable {
+    var showCreateGroupModalBottomSheet by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showJoinGroupModalBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
 
     when (val state = userGroupsState) {
         HomeState.Loading -> {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(localColorScheme.background.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+            LaunchedEffect(true) {
+                LoadingController.showLoading()
+            }
+
+            DisposableEffect(true) {
+                onDispose {
+                    LoadingController.hideLoading()
+                }
             }
         }
 
@@ -98,26 +104,40 @@ fun HomeScreen(
                     Scaffold(
                         modifier = modifier.fillMaxSize(),
                         backgroundColor = localColorScheme.background,
-                        floatingActionButton = {
-                            FloatingActionButton(
-                                backgroundColor = localColorScheme.primary,
-                                onClick = {
-                                    showBottomSheet = true
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Filled.Add,
-                                    contentDescription = ""
-                                )
-                            }
-                        },
                         topBar = {
-                            Text(
-                                text = stringResource(R.string.homeScreen_ui_topLabel),
-                                style = typography.headlineMedium,
-                                color = localColorScheme.secondary,
-                                modifier = Modifier.padding(16.dp)
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = stringResource(R.string.homeScreen_ui_topLabel),
+                                    style = typography.headlineMedium,
+                                    color = localColorScheme.secondary,
+                                )
+                                IconButton(
+                                    onClick = {
+                                        showJoinGroupModalBottomSheet = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Link,
+                                        contentDescription = "Join to group"
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        showCreateGroupModalBottomSheet = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = "Create group"
+                                    )
+                                }
+                            }
                         },
                         content = { innerPadding ->
                             Box(
@@ -147,7 +167,7 @@ fun HomeScreen(
                                     state = pullRefreshState
                                 )
 
-                                if (showBottomSheet) {
+                                if (showCreateGroupModalBottomSheet) {
                                     val focusManager = LocalFocusManager.current
                                     var name by rememberSaveable {
                                         mutableStateOf("")
@@ -157,10 +177,10 @@ fun HomeScreen(
                                     }
 
                                     ModalBottomSheet(
-                                        containerColor = DarkGrey,
+                                        containerColor = localColorScheme.tertiaryContainer,
                                         sheetState = sheetState,
                                         onDismissRequest = {
-                                            showBottomSheet = false
+                                            showCreateGroupModalBottomSheet = false
                                         },
                                         dragHandle = {
 
@@ -211,7 +231,7 @@ fun HomeScreen(
                                                         name,
                                                         selectedCurrency
                                                     )
-                                                    showBottomSheet = false
+                                                    showCreateGroupModalBottomSheet = false
                                                 },
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = localColorScheme.primary
@@ -219,6 +239,74 @@ fun HomeScreen(
                                             ) {
                                                 Text(
                                                     text = stringResource(id = R.string.createGroupModalBottomSheet_ui_newGroupButtonLabel),
+                                                    style = typography.bodyLarge.copy(
+                                                        fontWeight = FontWeight.Bold
+                                                    ),
+                                                    color = localColorScheme.secondary
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                if (showJoinGroupModalBottomSheet) {
+                                    val focusManager = LocalFocusManager.current
+                                    var inviteCode by rememberSaveable {
+                                        mutableStateOf("")
+                                    }
+
+                                    ModalBottomSheet(
+                                        containerColor = localColorScheme.tertiaryContainer,
+                                        sheetState = sheetState,
+                                        onDismissRequest = {
+                                            showJoinGroupModalBottomSheet = false
+                                        },
+                                        dragHandle = {
+
+                                        }
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(horizontal = 24.dp)
+                                                .padding(top = 16.dp, bottom = 32.dp),
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.joinGroupModalBottomSheet_ui_joinGroupTitle),
+                                                style = typography.headlineLarge,
+                                                color = localColorScheme.secondary,
+                                            )
+                                            TextField(
+                                                modifier = Modifier
+                                                    .padding(top = 4.dp)
+                                                    .fillMaxWidth(),
+                                                label = stringResource(R.string.joinGroupModalBottomSheet_ui_joinGroupTextFieldHint),
+                                                value = inviteCode,
+                                                onValueChange = {
+                                                    inviteCode = it
+                                                },
+                                                type = TextFieldType.Common,
+                                                onImeAction = {
+                                                    focusManager.clearFocus()
+                                                },
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                )
+                                            )
+                                            Button(
+                                                modifier = Modifier
+                                                    .padding(top = 4.dp)
+                                                    .align(Alignment.End),
+                                                onClick = {
+                                                    homeViewModel.joinGroup(inviteCode)
+                                                    showJoinGroupModalBottomSheet = false
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = localColorScheme.primary
+                                                )
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.joinGroupModalBottomSheet_ui_joinGroupButtonLabel),
                                                     style = typography.bodyLarge.copy(
                                                         fontWeight = FontWeight.Bold
                                                     ),
