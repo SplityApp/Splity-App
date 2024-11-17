@@ -6,7 +6,8 @@ import com.igorj.splity.AuthViewModel
 import com.igorj.splity.api.AuthApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
-import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsViewModel
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
+import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesViewModel
 import com.igorj.splity.ui.composable.main.home.HomeViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
@@ -29,7 +30,11 @@ val appModule = module {
     }
 
     viewModel {
-        GroupDetailsViewModel(get())
+        ExpenseViewModel(get())
+    }
+
+    viewModel {
+        BalancesViewModel(get())
     }
 
     single<SharedPreferences>(named(TOKEN_MANAGER_SHARED_PREFERENCES)){
