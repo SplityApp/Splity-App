@@ -47,4 +47,10 @@
     <string name="createGroupModalBottomSheet_ui_newGroupTitle">New group</string>
     <string name="createGroupModalBottomSheet_ui_newGroupTextFieldHint">Group name</string>
     <string name="createGroupModalBottomSheet_ui_newGroupButtonLabel">Create</string>
+    
+    <string name="groupDetailsScreen_ui_screenSwitchButtonLeftLabel">Expenses</string>
+    <string name="groupDetailsScreen_ui_screenSwitchButtonRightLabel">Balances</string>
+
+    <string name="balanceScreen_ui_yourBalanceCardTitle">Your balance</string>
+    <string name="balanceScreen_ui_balancesSectionLabel">Total balance</string>
 </resources>

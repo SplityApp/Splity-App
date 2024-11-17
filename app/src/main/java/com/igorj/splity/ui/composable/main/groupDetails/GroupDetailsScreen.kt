@@ -9,7 +9,9 @@ import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.igorj.splity.R
 import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesScreen
 import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpensesScreen
 import com.igorj.splity.ui.theme.localColorScheme
@@ -35,8 +37,8 @@ fun GroupDetailsScreen(
             rightScreen = {
                 BalancesScreen(groupId = groupId)
             },
-            leftLabel = "Expenses",
-            rightLabel = "Balances",
+            leftLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonLeftLabel),
+            rightLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonRightLabel),
             leftIcon = Icons.Default.AttachMoney,
             rightIcon = Icons.Default.Balance
         )

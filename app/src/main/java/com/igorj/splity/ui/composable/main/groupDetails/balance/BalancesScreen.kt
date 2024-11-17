@@ -17,8 +17,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.igorj.splity.R
 import com.igorj.splity.model.main.balance.BalanceState
 import com.igorj.splity.ui.composable.main.home.HomeCard
 import com.igorj.splity.ui.theme.localColorScheme
@@ -53,7 +55,7 @@ fun BalancesScreen(
         is BalanceState.Success -> {
             Column {
                 HomeCard(
-                    title = "Your balance",
+                    title = stringResource(R.string.balanceScreen_ui_yourBalanceCardTitle),
                     amount = state.balancesResponse.requestUser.balance,
                     currency = state.balancesResponse.currency,
                     onClick = {}
@@ -64,7 +66,7 @@ fun BalancesScreen(
                     backgroundColor = localColorScheme.background,
                     topBar = {
                         Text(
-                            text = "Balances",
+                            text = stringResource(R.string.balanceScreen_ui_balancesSectionLabel),
                             style = typography.headlineSmall,
                             color = localColorScheme.secondary,
                             modifier = Modifier.padding(16.dp)
