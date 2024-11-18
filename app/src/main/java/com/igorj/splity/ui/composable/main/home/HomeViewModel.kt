@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.CreateGroupRequest
 import com.igorj.splity.api.HomeApi
+import com.igorj.splity.api.JoinGroupRequest
 import com.igorj.splity.model.main.errorResponse
 import com.igorj.splity.model.main.home.HomeState
+import com.igorj.splity.util.LoadingController
 import com.igorj.splity.util.SnackbarConfig
 import com.igorj.splity.util.SnackbarController
 import com.igorj.splity.util.SnackbarEvent
@@ -25,8 +27,9 @@ class HomeViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    fun getUserGroups() {
+    fun refreshUserGroups() {
         viewModelScope.launch {
+            LoadingController.showLoading()
             val response = homeApi.getUserGroups()
             if (response.isSuccessful && response.body() != null) {
                 _userGroups.value = HomeState.Success(response.body()!!.groups)
@@ -34,11 +37,13 @@ class HomeViewModel(
                 val error = errorResponse(response.errorBody()?.string())
                 _userGroups.value = HomeState.Error(error.message)
             }
+            LoadingController.hideLoading()
         }
     }
 
     fun createGroup(groupName: String, currency: Currency) {
         viewModelScope.launch {
+            LoadingController.showLoading()
             val response = homeApi.createGroup(
                 CreateGroupRequest(
                     name = groupName,
@@ -61,6 +66,34 @@ class HomeViewModel(
                     )
                 )
             }
+            LoadingController.hideLoading()
+        }
+    }
+
+    fun joinGroup(inviteCode: String) {
+        viewModelScope.launch {
+            LoadingController.showLoading()
+            val response = homeApi.joinGroup(
+                JoinGroupRequest(inviteCode)
+            )
+            if (response.isSuccessful && response.body() != null) {
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = "Group joined",
+                        config = SnackbarConfig(backgroundColor = Color.Green)
+                    )
+                )
+                refreshUserGroups()
+            } else {
+                val error = errorResponse(response.errorBody()?.string())
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = error.message,
+                        config = SnackbarConfig(backgroundColor = Color.Red)
+                    )
+                )
+            }
+            LoadingController.hideLoading()
         }
     }
 }

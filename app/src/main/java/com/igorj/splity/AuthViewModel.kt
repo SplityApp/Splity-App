@@ -9,6 +9,7 @@ import com.igorj.splity.model.auth.AuthRegisterRequest
 import com.igorj.splity.model.auth.AuthState
 import com.igorj.splity.model.auth.SignUpState
 import com.igorj.splity.model.main.errorResponse
+import com.igorj.splity.util.LoadingController
 import com.igorj.splity.util.SnackbarConfig
 import com.igorj.splity.util.SnackbarController
 import com.igorj.splity.util.SnackbarEvent
@@ -25,9 +26,6 @@ class AuthViewModel(
     private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
     val authState = _authState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
     init {
         tokenManager.getToken()?.let {
             _authState.value = AuthState.Authenticated
@@ -36,8 +34,7 @@ class AuthViewModel(
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-
+            LoadingController.showLoading()
             val response = api.login(AuthLoginRequest(email, password))
             if (response.isSuccessful && response.body()?.token != null) {
                 val token = response.body()!!.token
@@ -58,15 +55,13 @@ class AuthViewModel(
                     )
                 )
             }
-            
-            _isLoading.value = false
+            LoadingController.hideLoading()
         }
     }
 
     fun register(signUpState: SignUpState) {
         viewModelScope.launch {
-            _isLoading.value = true
-
+            LoadingController.showLoading()
             val request = AuthRegisterRequest(
                 email = signUpState.email,
                 password = signUpState.password,
@@ -90,8 +85,7 @@ class AuthViewModel(
                     )
                 )
             }
-            
-            _isLoading.value = false
+            LoadingController.hideLoading()
         }
     }
 
