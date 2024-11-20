@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.GetGroupDetailsRequest
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
+import com.igorj.splity.util.LoadingController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,8 +21,8 @@ class ExpenseViewModel(
     val isRefreshing = _isRefreshing.asStateFlow()
 
     fun getGroupDetails(groupId: String) {
-        _groupDetails.value = GroupDetailsState.Loading
         viewModelScope.launch {
+            LoadingController.showLoading()
             try {
                 val response = groupApi.getGroupDetails(GetGroupDetailsRequest(groupId))
                 Log.d("GroupDetailsViewModel", "getGroupDetails: $response")
@@ -30,6 +31,7 @@ class ExpenseViewModel(
                 _groupDetails.value = GroupDetailsState.Error(e.message ?: "An error occurred")
                 Log.d("GroupDetailsViewModel", "getGroupDetailsError: ${e.message}")
             }
+            LoadingController.hideLoading()
         }
     }
 }
