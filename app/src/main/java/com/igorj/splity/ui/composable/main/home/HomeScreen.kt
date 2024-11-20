@@ -322,12 +322,8 @@ fun HomeScreen(
                 }
                 composable("groupDetails/{groupId}") { backStackEntry ->
                     val groupId = backStackEntry.arguments?.getString("groupId")
-                    val groupName = state.userGroups.find { it.id == groupId }?.name
                     groupId?.let {
-                        GroupDetailsScreen(
-                            groupId = it,
-                            groupName = groupName ?: ""
-                        )
+                        GroupDetailsScreen(groupId = it)
                     }
                 }
             }

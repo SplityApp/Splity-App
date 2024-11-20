@@ -30,91 +30,103 @@ fun ScreenSwitch(
 ) {
     var selectedOption by remember { mutableStateOf(Option.FIRST) }
 
-    Scaffold(
-        topBar = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 30.dp)
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Switch buttons in a more compact container
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(localColorScheme.surface)
+                .height(40.dp), // Fixed height for the switch
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = {
+                    selectedOption = Option.FIRST
+                    onSwitch?.invoke()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedOption == Option.FIRST)
+                        localColorScheme.primary
+                    else
+                        localColorScheme.surface,
+                    contentColor = if (selectedOption == Option.FIRST)
+                        localColorScheme.onPrimary
+                    else
+                        localColorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(25.dp))
-                            .background(localColorScheme.surface),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = {
-                                selectedOption = Option.FIRST
-                                onSwitch?.invoke()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selectedOption == Option.FIRST)
-                                    localColorScheme.primary
-                                else
-                                    localColorScheme.surface,
-                                contentColor = if (selectedOption == Option.FIRST)
-                                    localColorScheme.onPrimary
-                                else
-                                    localColorScheme.onSurfaceVariant
-                            ),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = leftIcon,
-                                contentDescription = "leftIcon",
-                                tint = if (selectedOption == Option.FIRST) localColorScheme.onPrimary else localColorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(leftLabel)
-                        }
-                        Button(
-                            onClick = {
-                                selectedOption = Option.SECOND
-                                onSwitch?.invoke()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selectedOption == Option.SECOND)
-                                    localColorScheme.primary
-                                else
-                                    localColorScheme.surface,
-                                contentColor = if (selectedOption == Option.SECOND)
-                                    localColorScheme.onPrimary
-                                else
-                                    localColorScheme.onSurfaceVariant
-                            ),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = rightIcon,
-                                contentDescription = "rightIcon",
-                                tint = if (selectedOption == Option.FIRST) localColorScheme.onPrimary else localColorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(rightLabel)
-                        }
-                    }
+                    Icon(
+                        imageVector = leftIcon,
+                        contentDescription = "leftIcon",
+                        modifier = Modifier.size(16.dp),
+                        tint = if (selectedOption == Option.FIRST)
+                            localColorScheme.onPrimary
+                        else
+                            localColorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = leftLabel,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
-        },
-        content = { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
+            Button(
+                onClick = {
+                    selectedOption = Option.SECOND
+                    onSwitch?.invoke()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedOption == Option.SECOND)
+                        localColorScheme.primary
+                    else
+                        localColorScheme.surface,
+                    contentColor = if (selectedOption == Option.SECOND)
+                        localColorScheme.onPrimary
+                    else
+                        localColorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                if (selectedOption == Option.FIRST) {
-                    leftScreen()
-                } else {
-                    rightScreen()
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = rightIcon,
+                        contentDescription = "rightIcon",
+                        modifier = Modifier.size(16.dp),
+                        tint = if (selectedOption == Option.SECOND)
+                            localColorScheme.onPrimary
+                        else
+                            localColorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = rightLabel,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
-    )
+
+        // Content
+        Box(modifier = Modifier.weight(1f)) {
+            if (selectedOption == Option.FIRST) {
+                leftScreen()
+            } else {
+                rightScreen()
+            }
+        }
+    }
 }
 
 @Preview
@@ -122,10 +134,7 @@ fun ScreenSwitch(
 fun ScreenSwitchPreview() {
     ScreenSwitch(
         leftScreen = {
-            GroupDetailsScreen(
-                groupId = "1",
-                groupName = "Group name"
-            )
+            GroupDetailsScreen(groupId = "1")
         },
         rightScreen = {
             Box(

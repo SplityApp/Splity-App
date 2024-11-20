@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.igorj.splity.model.main.expense.ExpenseState
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
@@ -31,18 +32,19 @@ import java.util.Locale
 @Composable
 fun ExpensesScreen(
     expenseViewModel: ExpenseViewModel = koinViewModel(),
-    groupId: String
+    groupId: String,
+    currency: String
 ) {
     LaunchedEffect(true) {
-        expenseViewModel.getGroupDetails(groupId)
+        expenseViewModel.getExpenses(groupId)
     }
 
-    val groupDetailsState by expenseViewModel.groupDetails.collectAsStateWithLifecycle()
+    val expenseState by expenseViewModel.expenses.collectAsStateWithLifecycle()
     val isRefreshing by expenseViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, { expenseViewModel.getGroupDetails(groupId) })
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { expenseViewModel.getExpenses(groupId) })
 
-    when (val state = groupDetailsState) {
-        GroupDetailsState.Loading -> {
+    when (val state = expenseState) {
+        ExpenseState.Loading -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -52,7 +54,7 @@ fun ExpensesScreen(
                 CircularProgressIndicator()
             }
         }
-        is GroupDetailsState.Success -> {
+        is ExpenseState.Success -> {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 backgroundColor = localColorScheme.background,
@@ -63,7 +65,7 @@ fun ExpensesScreen(
                             .fillMaxSize()
                             .pullRefresh(pullRefreshState),
                     ) {
-                        val groupedExpenses = state.groupDetails.expenses
+                        val groupedExpenses = state.expenses
                             .groupBy { expense ->
                                 val date = Date(expense.createdAt.time)
                                 SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(date)
@@ -90,7 +92,7 @@ fun ExpensesScreen(
                                 items(expensesForDate) { expense ->
                                     ExpenseCard(
                                         expense = expense,
-                                        currency = state.groupDetails.currency
+                                        currency = currency,
                                     )
                                 }
                             }
@@ -104,7 +106,7 @@ fun ExpensesScreen(
                 }
             )
         }
-        is GroupDetailsState.Error -> {
+        is ExpenseState.Error -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

@@ -31,7 +31,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun BalancesScreen(
     balancesViewModel: BalancesViewModel = koinViewModel(),
-    groupId: String
+    groupId: String,
+    currency: String
 ) {
     LaunchedEffect(true) {
         balancesViewModel.getBalances(groupId)
@@ -57,7 +58,7 @@ fun BalancesScreen(
                 HomeCard(
                     title = stringResource(R.string.balanceScreen_ui_yourBalanceCardTitle),
                     amount = state.balancesResponse.requestUser.balance,
-                    currency = state.balancesResponse.currency,
+                    currency = currency,
                     onClick = {}
                 )
 
@@ -87,7 +88,7 @@ fun BalancesScreen(
                                         HomeCard(
                                             title = balance.name,
                                             amount = balance.balance,
-                                            currency = state.balancesResponse.currency,
+                                            currency = currency,
                                             onClick = {}
                                         )
                                     }

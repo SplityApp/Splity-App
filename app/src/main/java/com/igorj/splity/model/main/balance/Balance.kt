@@ -6,7 +6,6 @@ data class BalanceResponse(
     @SerializedName("request_user")
     val requestUser: Balance,
     val users: List<Balance>,
-    val currency: String
 )
 
 data class Balance(

@@ -24,11 +24,9 @@ class BalancesViewModel(
         viewModelScope.launch {
             try {
                 val response = groupApi.getBalances(GetBalancesRequest(groupId))
-                Log.d("GroupDetailsViewModel", "getGroupDetails: $response")
                 _balances.value = BalanceState.Success(response)
             } catch (e: Exception) {
                 _balances.value = BalanceState.Error(e.message ?: "An error occurred")
-                Log.d("GroupDetailsViewModel", "getGroupDetailsError: ${e.message}")
             }
         }
     }

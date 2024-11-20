@@ -44,11 +44,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.R
+import com.igorj.splity.api.GroupApi
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
 import com.igorj.splity.util.LoadingController
 import org.koin.androidx.compose.koinViewModel
@@ -115,16 +117,21 @@ fun GroupDetailsScreen(
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
                             .pullRefresh(pullRefreshState),
                     ) {
                         Column {
                             ScreenSwitch(
                                 leftScreen = {
-                                    ExpensesScreen(groupId = groupId)
+                                    ExpensesScreen(
+                                        groupId = groupId,
+                                        currency = state.groupDetails.currency
+                                    )
                                 },
                                 rightScreen = {
-                                    BalancesScreen(groupId = groupId)
+                                    BalancesScreen(
+                                        groupId = groupId,
+                                        currency = state.groupDetails.currency
+                                    )
                                 },
                                 leftLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonLeftLabel),
                                 rightLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonRightLabel),
