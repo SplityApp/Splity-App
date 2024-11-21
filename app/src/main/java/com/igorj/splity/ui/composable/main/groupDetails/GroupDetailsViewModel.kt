@@ -25,11 +25,9 @@ class GroupDetailsViewModel(
             LoadingController.showLoading()
             try {
                 val response = groupApi.getGroupDetails(GetGroupDetailsRequest(groupId))
-                Log.d("GroupDetailsViewModel", "getGroupDetails: $response")
                 _groupDetails.value = GroupDetailsState.Success(response)
             } catch (e: Exception) {
                 _groupDetails.value = GroupDetailsState.Error(e.message ?: "An error occurred")
-                Log.d("GroupDetailsViewModel", "getGroupDetailsError: ${e.message}")
             }
             LoadingController.hideLoading()
         }

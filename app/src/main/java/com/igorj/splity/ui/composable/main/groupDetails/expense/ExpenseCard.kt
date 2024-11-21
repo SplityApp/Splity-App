@@ -1,4 +1,4 @@
-package com.igorj.splity.ui.composable.main.groupDetails
+package com.igorj.splity.ui.composable.main.groupDetails.expense
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +17,7 @@ import com.igorj.splity.model.main.expense.ExpenseCategory
 import com.igorj.splity.ui.theme.DarkGreen
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
+import java.sql.Timestamp
 
 @Composable
 fun ExpenseCard(
@@ -86,7 +87,7 @@ fun ExpenseCardPreview() {
             amount = 10.0,
             state = "Paid",
             paidBy = "John Doe",
-            createdAt = java.sql.Timestamp(System.currentTimeMillis())
+            createdAt = Timestamp(System.currentTimeMillis())
         ),
         currency = "USD"
     )

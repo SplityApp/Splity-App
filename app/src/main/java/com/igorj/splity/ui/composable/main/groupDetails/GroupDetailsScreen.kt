@@ -1,5 +1,7 @@
 package com.igorj.splity.ui.composable.main.groupDetails
 
+import ScreenSwitch
+import ScreenSwitchOption
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,12 +12,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Share
@@ -45,13 +47,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.R
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
+import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesScreen
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpensesScreen
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import com.igorj.splity.util.LoadingController
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -69,6 +70,7 @@ fun GroupDetailsScreen(
     val isRefreshing by groupDetailsViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, { groupDetailsViewModel.getGroupDetails(groupId) })
     var showInviteToGroupDialog by rememberSaveable { mutableStateOf(false) }
+    var selectedOption by rememberSaveable { mutableStateOf(ScreenSwitchOption.First) }
 
     when (val state = groupDetailsState) {
         GroupDetailsState.Loading -> {
@@ -115,40 +117,31 @@ fun GroupDetailsScreen(
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
                             .pullRefresh(pullRefreshState),
                     ) {
-                        val groupedExpenses = state.groupDetails.expenses
-                            .groupBy { expense ->
-                                val date = Date(expense.createdAt.time)
-                                SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(date)
-                            }
-                            .toSortedMap(reverseOrder())
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            groupedExpenses.forEach { (date, expensesForDate) ->
-                                item {
-                                    Text(
-                                        text = date,
-                                        style = typography.titleMedium,
-                                        color = localColorScheme.secondary,
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            top = 16.dp,
-                                            bottom = 8.dp
-                                        )
-                                    )
-                                }
-
-                                items(expensesForDate) { expense ->
-                                    ExpenseCard(
-                                        expense = expense,
+                        Column {
+                            ScreenSwitch(
+                                leftScreen = {
+                                    ExpensesScreen(
+                                        groupId = groupId,
                                         currency = state.groupDetails.currency
                                     )
+                                },
+                                rightScreen = {
+                                    BalancesScreen(
+                                        groupId = groupId,
+                                        currency = state.groupDetails.currency
+                                    )
+                                },
+                                leftLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonLeftLabel),
+                                rightLabel = stringResource(id = R.string.groupDetailsScreen_ui_screenSwitchButtonRightLabel),
+                                leftIcon = Icons.Default.AttachMoney,
+                                rightIcon = Icons.Default.Balance,
+                                selectedOption = selectedOption,
+                                onSwitch = {
+                                    selectedOption = it
                                 }
-                            }
+                            )
                         }
 
                         PullRefreshIndicator(

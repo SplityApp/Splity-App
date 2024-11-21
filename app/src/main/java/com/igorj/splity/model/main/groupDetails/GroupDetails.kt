@@ -12,5 +12,4 @@ data class GroupDetails(
     val createdAt: Timestamp,
     @SerializedName("invite_code")
     val inviteCode: String,
-    val expenses: List<Expense> = emptyList()
 )

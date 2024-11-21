@@ -47,6 +47,7 @@
     <string name="createGroupModalBottomSheet_ui_newGroupTitle">New group</string>
     <string name="createGroupModalBottomSheet_ui_newGroupTextFieldHint">Group name</string>
     <string name="createGroupModalBottomSheet_ui_newGroupButtonLabel">Create</string>
+
     <string name="joinGroupModalBottomSheet_ui_joinGroupTitle">Join group</string>
     <string name="joinGroupModalBottomSheet_ui_joinGroupTextFieldHint">Invite code</string>
     <string name="joinGroupModalBottomSheet_ui_joinGroupButtonLabel">Join</string>
@@ -57,4 +58,9 @@
     <string name="groupDetailsScreen_ui_inviteCodeDialogCopyCodeButtonText">Tap to copy</string>
     <string name="groupDetailsScreen_alt_inviteCodeDialogCopyCodeButton">Copy invite code</string>
     <string name="groupDetailsScreen_ui_inviteCodeDialogDescription">Share this code with your friends to invite them to the group!</string>
+    <string name="groupDetailsScreen_ui_screenSwitchButtonLeftLabel">Expenses</string>
+    <string name="groupDetailsScreen_ui_screenSwitchButtonRightLabel">Balances</string>
+
+    <string name="balanceScreen_ui_yourBalanceCardTitle">Your balance</string>
+    <string name="balanceScreen_ui_balancesSectionLabel">Total balance</string>
 </resources>
