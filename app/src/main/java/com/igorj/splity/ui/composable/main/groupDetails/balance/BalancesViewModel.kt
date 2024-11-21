@@ -1,6 +1,5 @@
 package com.igorj.splity.ui.composable.main.groupDetails.balance
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.GetBalancesRequest
@@ -20,7 +19,6 @@ class BalancesViewModel(
     val isRefreshing = _isRefreshing.asStateFlow()
 
     fun getBalances(groupId: String) {
-        _balances.value = BalanceState.Loading
         viewModelScope.launch {
             try {
                 val response = groupApi.getBalances(GetBalancesRequest(groupId))
