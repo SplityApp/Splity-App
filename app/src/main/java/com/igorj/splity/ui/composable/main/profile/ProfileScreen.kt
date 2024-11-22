@@ -68,7 +68,7 @@ fun ProfileScreen(
                 ) {
                     EmojiAvatar(
                         size = 120.dp,
-                        emoji = state.userInfo.username.first().toString(),
+                        emoji = state.userInfo.charImage,
                     )
                     Text(
                         text = state.userInfo.username,

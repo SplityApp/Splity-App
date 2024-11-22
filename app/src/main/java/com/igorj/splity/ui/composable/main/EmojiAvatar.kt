@@ -30,7 +30,8 @@ fun EmojiAvatar(
     ) {
         Text(
             text = emoji,
-            fontSize = (size.value * 0.5f).sp
+            fontSize = (size.value * 0.5f).sp,
+            color = Color.Black
         )
     }
 }
