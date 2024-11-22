@@ -3,12 +3,15 @@ package com.igorj.splity.koin
 import android.content.Context
 import android.content.SharedPreferences
 import com.igorj.splity.AuthViewModel
+import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.api.AuthApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
+import com.igorj.splity.api.ProfileApi
+import com.igorj.splity.repository.UserInfoRepository
 import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsViewModel
-import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesViewModel
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.home.HomeViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
@@ -23,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
     viewModel {
-        AuthViewModel(get(), get())
+        AuthViewModel(get(), get(), get())
     }
 
     viewModel {
@@ -42,6 +45,10 @@ val appModule = module {
         BalancesViewModel(get())
     }
 
+    viewModel {
+        ProfileViewModel(get(), get())
+    }
+
     single<SharedPreferences>(named(TOKEN_MANAGER_SHARED_PREFERENCES)){
         androidContext().getSharedPreferences(
             TOKEN_MANAGER_SHARED_PREFERENCES,
@@ -50,6 +57,16 @@ val appModule = module {
     }
 
     single { TokenManager(get(named(TOKEN_MANAGER_SHARED_PREFERENCES))) }
+
+
+    single<SharedPreferences>(named(USER_INFO_SHARED_PREFERENCES)){
+        androidContext().getSharedPreferences(
+            USER_INFO_SHARED_PREFERENCES,
+            Context.MODE_PRIVATE
+        )
+    }
+
+    single { UserInfoRepository(get(named(USER_INFO_SHARED_PREFERENCES))) }
 
     single<Interceptor> { AuthInterceptor(get()) }
 
@@ -70,7 +87,10 @@ val appModule = module {
     single { get<Retrofit>().create(HomeApi::class.java) }
 
     single { get<Retrofit>().create(GroupApi::class.java) }
+
+    single { get<Retrofit>().create(ProfileApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"
 const val TOKEN_MANAGER_SHARED_PREFERENCES = "token_manager_shared_preferences"
+const val USER_INFO_SHARED_PREFERENCES = "user_info_shared_preferences"

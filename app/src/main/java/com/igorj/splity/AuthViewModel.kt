@@ -9,6 +9,7 @@ import com.igorj.splity.model.auth.AuthRegisterRequest
 import com.igorj.splity.model.auth.AuthState
 import com.igorj.splity.model.auth.SignUpState
 import com.igorj.splity.model.main.errorResponse
+import com.igorj.splity.repository.UserInfoRepository
 import com.igorj.splity.util.LoadingController
 import com.igorj.splity.util.SnackbarConfig
 import com.igorj.splity.util.SnackbarController
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val api: AuthApi,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val userInfoRepository: UserInfoRepository
 ): ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
@@ -35,6 +37,7 @@ class AuthViewModel(
     fun login(email: String, password: String) {
         viewModelScope.launch {
             LoadingController.showLoading()
+            userInfoRepository.clearUserInfo()
             val response = api.login(AuthLoginRequest(email, password))
             if (response.isSuccessful && response.body()?.token != null) {
                 val token = response.body()!!.token
@@ -122,6 +125,7 @@ class AuthViewModel(
 
     fun logout() {
         tokenManager.clearToken()
+        userInfoRepository.clearUserInfo()
         _authState.value = AuthState.Initial
     }
 }
