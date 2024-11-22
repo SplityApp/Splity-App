@@ -115,7 +115,8 @@ class ProfileViewModel(
         username: String,
         email: String,
         charImage: String,
-        onComplete: () -> Unit
+        emailHasChanged: Boolean,
+        onComplete: () -> Unit,
     ){
         viewModelScope.launch {
             try {
@@ -125,11 +126,13 @@ class ProfileViewModel(
 
                 if (response.isSuccessful) {
                     response.body()?.let { userInfo ->
+                        val message = if (emailHasChanged) "Confirm change on email"
+                            else "User info updated"
                         userInfoRepository.saveUserInfo(userInfo)
                         _userInfoState.value = UserInfoState.Success(userInfo)
                         SnackbarController.showSnackbar(
                             SnackbarEvent(
-                                message = "Updated successfully",
+                                message = message,
                                 config = SnackbarConfig(backgroundColor = Color.Green)
                             )
                         )

@@ -153,6 +153,7 @@ class AuthViewModel(
 
     fun logout() {
         tokenManager.clearToken()
+        tokenManager.clearRefreshToken()
         userInfoRepository.clearUserInfo()
         _authState.value = AuthState.Initial
     }

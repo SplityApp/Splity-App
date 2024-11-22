@@ -271,6 +271,7 @@ fun ProfileScreen(
                                             username,
                                             email,
                                             charImage,
+                                            state.userInfo.email != email,
                                             onComplete = {
                                                 isLoading = false
                                                 showChangeUserInfoModalBottomSheet = false
