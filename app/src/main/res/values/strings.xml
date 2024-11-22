@@ -70,4 +70,9 @@
 
     <string name="balanceScreen_ui_yourBalanceCardTitle">Your balance</string>
     <string name="balanceScreen_ui_balancesSectionLabel">Total balance</string>
+    <string name="profile_screen_ui_character_image">Character image</string>
+    <string name="profile_screen_ui_edit">Edit</string>
+    <string name="profile_screen_ui_logout">Logout</string>
+    <string name="profile_screen_ui_change_user_info">Change user info</string>
+    <string name="profile_screen_ui_save">Save</string>
 </resources>

@@ -2,12 +2,17 @@ package com.igorj.splity
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.ChangeNotificationsRequest
+import com.igorj.splity.api.ChangeUserInfoRequest
 import com.igorj.splity.api.ProfileApi
 import com.igorj.splity.model.main.profile.UserInfoState
 import com.igorj.splity.repository.UserInfoRepository
+import com.igorj.splity.util.SnackbarConfig
+import com.igorj.splity.util.SnackbarController
+import com.igorj.splity.util.SnackbarEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -102,6 +107,57 @@ class ProfileViewModel(
                 loadUserInfo()
             } finally {
                 _isUpdatingPreferences.value = false
+            }
+        }
+    }
+
+    fun changeUserInfo(
+        username: String,
+        email: String,
+        charImage: String,
+        onComplete: () -> Unit
+    ){
+        viewModelScope.launch {
+            try {
+                val response = profileApi.changeUserInfo(
+                    ChangeUserInfoRequest(username, email, charImage)
+                )
+
+                if (response.isSuccessful) {
+                    response.body()?.let { userInfo ->
+                        userInfoRepository.saveUserInfo(userInfo)
+                        _userInfoState.value = UserInfoState.Success(userInfo)
+                        SnackbarController.showSnackbar(
+                            SnackbarEvent(
+                                message = "Updated successfully",
+                                config = SnackbarConfig(backgroundColor = Color.Green)
+                            )
+                        )
+                    } ?: run {
+                        SnackbarController.showSnackbar(
+                            SnackbarEvent(
+                                message = "Empty response",
+                                config = SnackbarConfig(backgroundColor = Color.Red)
+                            )
+                        )
+                    }
+                } else {
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = "Error: ${response.message()}",
+                            config = SnackbarConfig(backgroundColor = Color.Red)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = "Error: ${e.message}",
+                        config = SnackbarConfig(backgroundColor = Color.Red)
+                    )
+                )
+            } finally {
+                onComplete()
             }
         }
     }

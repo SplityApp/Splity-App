@@ -16,6 +16,11 @@ interface ProfileApi {
     suspend fun updateNotificationPreferences(
         @Body request: ChangeNotificationsRequest
     ): Response<ChangeNotificationsResponse>
+
+    @PATCH("change-user-info")
+    suspend fun changeUserInfo(
+        @Body request: ChangeUserInfoRequest
+    ): Response<UserInfo>
 }
 
 data class ChangeNotificationsRequest(
@@ -26,4 +31,11 @@ data class ChangeNotificationsRequest(
 data class ChangeNotificationsResponse(
     @SerializedName("allowed_notifications")
     val allowedNotifications: Boolean
+)
+
+data class ChangeUserInfoRequest(
+    val username: String,
+    val email: String,
+    @SerializedName("char_image")
+    val charImage: String
 )

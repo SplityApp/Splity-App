@@ -41,7 +41,10 @@ class AuthViewModel(
             val response = api.login(AuthLoginRequest(email, password))
             if (response.isSuccessful && response.body()?.token != null) {
                 val token = response.body()!!.token
+                val refreshToken = response.body()!!.refreshToken
+
                 tokenManager.saveToken(token)
+                tokenManager.saveRefreshToken(refreshToken)
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
                         message = "Login successful",

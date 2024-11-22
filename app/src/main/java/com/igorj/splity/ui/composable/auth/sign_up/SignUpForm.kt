@@ -109,7 +109,9 @@ fun SignUpForm(
                 label = stringResource(id = R.string.signUpScreen_ui_phoneNumberTextFieldLabel),
                 value = signUpState.phoneNumber,
                 onValueChange = {
-                    signUpFormCallbacks.onPhoneNumberChanged(it)
+                    if (it.length < 10) {
+                        signUpFormCallbacks.onPhoneNumberChanged(it)
+                    }
                 },
                 onImeAction = {
                     focusManager.moveFocus(FocusDirection.Next)
