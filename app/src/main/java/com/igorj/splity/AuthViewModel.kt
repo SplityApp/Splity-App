@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.UserResetPasswordRequest
 import com.igorj.splity.model.auth.AuthLoginRequest
 import com.igorj.splity.model.auth.AuthRegisterRequest
 import com.igorj.splity.model.auth.AuthState
@@ -79,6 +80,30 @@ class AuthViewModel(
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
                         message = "Registration successful",
+                        config = SnackbarConfig(backgroundColor = Color.Green)
+                    )
+                )
+            } else {
+                val error = errorResponse(response.errorBody()?.string())
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = error.message,
+                        config = SnackbarConfig(backgroundColor = Color.Red)
+                    )
+                )
+            }
+            LoadingController.hideLoading()
+        }
+    }
+
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            LoadingController.showLoading()
+            val response = api.userResetPassword(UserResetPasswordRequest(email))
+            if (response.isSuccessful) {
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = "Password reset email sent",
                         config = SnackbarConfig(backgroundColor = Color.Green)
                     )
                 )
