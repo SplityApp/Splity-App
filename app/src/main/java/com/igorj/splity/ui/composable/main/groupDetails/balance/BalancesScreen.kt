@@ -89,7 +89,13 @@ fun BalancesScreen(
                                             title = balance.name,
                                             amount = balance.balance,
                                             currency = currency,
-                                            onClick = {}
+                                            onClick = {
+                                                balancesViewModel.sendPushNotification(
+                                                    balance.id,
+                                                    "User has paid you!",
+                                                    "Check new balance"
+                                                )
+                                            }
                                         )
                                     }
                                 }

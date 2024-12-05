@@ -1,7 +1,7 @@
 package com.igorj.splity.model.main.groupDetails
 
 import com.google.gson.annotations.SerializedName
-import com.igorj.splity.model.main.expense.Expense
+import com.igorj.splity.model.main.UserInfo
 import java.sql.Timestamp
 
 data class GroupDetails(
@@ -12,4 +12,7 @@ data class GroupDetails(
     val createdAt: Timestamp,
     @SerializedName("invite_code")
     val inviteCode: String,
+    val profiles: List<UserInfo>,
+    @SerializedName("updated_at")
+    val updatedAt: Timestamp
 )
