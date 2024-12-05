@@ -22,7 +22,10 @@ import com.igorj.splity.model.payment.PaymentParticipant
 import com.igorj.splity.ui.composable.main.home.HomeScreen
 import com.igorj.splity.ui.composable.main.payment.Payment
 import com.igorj.splity.ui.composable.main.profile.ProfileScreen
+import com.igorj.splity.ui.composable.main.stats.StatsScreen
 import java.util.Currency
+import com.igorj.splity.ui.composable.main.stats.Payment
+import java.time.LocalDate
 
 @Composable
 fun MainScreen(
@@ -59,24 +62,32 @@ fun MainScreen(
                     HomeScreen()
                 }
                 composable(BottomNavItem.Stats.route) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Payment(
-                            amount = 20.00,
-                            payer = PaymentParticipant(
-                                username = "Test Payer",
-                                phoneNumber = "123456789",
-                                email = "testpayer@mail.com",
+                    StatsScreen(
+                        payments = listOf(
+                            Payment(
+                                date = LocalDate.now(),
+                                amount = 100.00
                             ),
-                            receiver = PaymentParticipant(
-                                username = "Test Receiver",
-                                phoneNumber = "987654321",
-                                email = "testreceiver@mail.com",
+                            Payment(
+                                date = LocalDate.now().minusMonths(1),
+                                amount = 50.00
                             ),
-                            currency = Currency.getInstance("PLN")
-                        )
-                    }
+                            Payment(
+                                date = LocalDate.now().minusMonths(2),
+                                amount = 200.00
+                            ),
+                            Payment(
+                                date = LocalDate.now().minusMonths(3),
+                                amount = 150.00
+                            ),
+                            Payment(
+                                date = LocalDate.now().minusMonths(4),
+                                amount = 300.00
+                            ),
+                        ),
+                        startDate = LocalDate.now().minusMonths(4),
+                        endDate = LocalDate.now()
+                    )
                 }
                 composable(BottomNavItem.Profile.route) {
                     ProfileScreen(

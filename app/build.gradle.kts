@@ -97,4 +97,7 @@ dependencies {
     
     // Tpay
     implementation("com.tpay:sdk:1.2.1")
+
+    // YCharts
+    implementation("co.yml:ycharts:2.1.0")
 }
