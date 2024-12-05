@@ -85,8 +85,10 @@ fun MainScreen(
                                 amount = 300.00
                             ),
                         ),
-                        startDate = LocalDate.now().minusMonths(4),
-                        endDate = LocalDate.now()
+                        initialStartDate = LocalDate.now().minusMonths(4),
+                        initialEndDate = LocalDate.now(),
+                        onStartDateChange = {},
+                        onEndDateChange = {}
                     )
                 }
                 composable(BottomNavItem.Profile.route) {

@@ -1,18 +1,34 @@
 package com.igorj.splity.ui.composable.main.stats
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
@@ -30,9 +46,16 @@ data class Payment(
 @Composable
 fun StatsScreen(
     payments: List<Payment>,
-    startDate: LocalDate,
-    endDate: LocalDate
+    initialStartDate: LocalDate,
+    initialEndDate: LocalDate,
+    onStartDateChange: (LocalDate) -> Unit,
+    onEndDateChange: (LocalDate) -> Unit
 ) {
+    var startDate by remember { mutableStateOf(initialStartDate) }
+    var endDate by remember { mutableStateOf(initialEndDate) }
+    var isStartDatePickerVisible by remember { mutableStateOf(false) }
+    var isEndDatePickerVisible by remember { mutableStateOf(false) }
+
     val filteredPayments = remember(payments, startDate, endDate) {
         payments.filter { it.date.isAfter(startDate.minusDays(1)) && it.date.isBefore(endDate.plusDays(1)) }
     }
@@ -80,7 +103,7 @@ fun StatsScreen(
             .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .backgroundColor(MaterialTheme.colorScheme.background)
-            .build(),
+            .build()
     )
 
     Column(
@@ -89,11 +112,30 @@ fun StatsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Payments from ${startDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))} to ${endDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DatePicker(
+                date = startDate,
+                onDateChange = {
+                    startDate = it
+                    onStartDateChange(it)
+                },
+                isPickerVisible = isStartDatePickerVisible,
+                onPickerVisibilityChange = { isStartDatePickerVisible = it }
+            )
+            DatePicker(
+                date = endDate,
+                onDateChange = {
+                    endDate = it
+                    onEndDateChange(it)
+                },
+                isPickerVisible = isEndDatePickerVisible,
+                onPickerVisibilityChange = { isEndDatePickerVisible = it }
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -104,10 +146,171 @@ fun StatsScreen(
             barChartData = barChartData
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "Monthly Payments",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+    }
+
+    if (isStartDatePickerVisible) {
+        DatePickerDialog(
+            date = startDate,
+            onDateChange = {
+                startDate = it
+                onStartDateChange(it)
+                isStartDatePickerVisible = false
+            },
+            onDismissRequest = { isStartDatePickerVisible = false }
+        )
+    }
+
+    if (isEndDatePickerVisible) {
+        DatePickerDialog(
+            date = endDate,
+            onDateChange = {
+                endDate = it
+                onEndDateChange(it)
+                isEndDatePickerVisible = false
+            },
+            onDismissRequest = { isEndDatePickerVisible = false }
+        )
+    }
+}
+
+@Composable
+fun DatePicker(
+    date: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
+    isPickerVisible: Boolean,
+    onPickerVisibilityChange: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            onPickerVisibilityChange(!isPickerVisible)
+        }
+    ) {
+        Text(
+            text = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Icon(
+            imageVector = Icons.Default.DateRange,
+            contentDescription = "Date Picker",
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun DatePickerDialog(
+    date: LocalDate,
+    onDateChange: (LocalDate) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val year = date.year
+    val month = date.monthValue
+    val day = date.dayOfMonth
+
+    var selectedYear by remember { mutableStateOf(year) }
+    var selectedMonth by remember { mutableStateOf(month) }
+    var selectedDay by remember { mutableStateOf(day) }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(text = "Select a date")
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    NumberPicker(
+                        title = "Day",
+                        value = selectedYear,
+                        onValueChange = { selectedYear = it },
+                        range = 1980..2030
+                    )
+                    NumberPicker(
+                        title = "Month",
+                        value = selectedMonth,
+                        onValueChange = { selectedMonth = it },
+                        range = 1..12
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDateChange(LocalDate.of(selectedYear, selectedMonth, selectedDay))
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismissRequest
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun NumberPicker(
+    title: String,
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    range: IntRange
+) {
+    Column(
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { onValueChange(value + 1) },
+                enabled = value > range.first
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowUpward,
+                    contentDescription = "Increase value"
+                )
+            }
+            Text(
+                text = value.toString(),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            IconButton(
+                onClick = { onValueChange(value - 1) },
+                enabled = value < range.last
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowDownward,
+                    contentDescription = "Decrease value"
+                )
+            }
+        }
     }
 }
