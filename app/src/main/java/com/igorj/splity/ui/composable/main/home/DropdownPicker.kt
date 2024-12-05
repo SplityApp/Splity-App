@@ -22,22 +22,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
-import java.util.Currency
 
 @Composable
-fun CurrencyPicker(
-    selectedCurrency: Currency,
-    onCurrencySelected: (Currency) -> Unit,
+fun DropdownPicker(
+    label: String,
+    menuWidth: Dp = 120.dp,
+    availableValues: List<String>,
+    selectedValue: String,
+    onValueSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val currencies = remember {
-        Currency.getAvailableCurrencies()
-            .sortedBy { it.currencyCode }
-    }
 
     Box(
         modifier = modifier,
@@ -51,8 +51,8 @@ fun CurrencyPicker(
         ) {
             DisplayTextField(
                 modifier = Modifier.fillMaxWidth(),
-                label = "Group currency",
-                value = selectedCurrency.currencyCode,
+                label = label,
+                value = selectedValue,
             )
             Icon(
                 modifier = Modifier
@@ -60,7 +60,7 @@ fun CurrencyPicker(
                     .align(Alignment.CenterEnd)
                     .rotate(if (expanded) 180f else 0f),
                 imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Select currency",
+                contentDescription = label,
             )
         }
 
@@ -69,18 +69,20 @@ fun CurrencyPicker(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .background(localColorScheme.secondaryContainer)
-                .width(120.dp)
+                .width(menuWidth)
         ) {
-            currencies.forEach { currency ->
+            availableValues.forEach { value ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = currency.currencyCode,
-                            style = typography.bodyMedium
+                            text = value,
+                            style = typography.bodyMedium,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
                         )
                     },
                     onClick = {
-                        onCurrencySelected(currency)
+                        onValueSelected(value)
                         expanded = false
                     }
                 )

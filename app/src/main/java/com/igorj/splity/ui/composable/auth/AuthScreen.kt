@@ -59,6 +59,9 @@ fun AuthScreen(
                 modifier = Modifier.fillMaxSize(),
                 onNavigate = {
                     navController.navigate(it)
+                },
+                onConfirm = { email ->
+                    authViewModel.resetPassword(email)
                 }
             )
         }

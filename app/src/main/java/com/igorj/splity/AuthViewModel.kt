@@ -4,11 +4,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.UserResetPasswordRequest
 import com.igorj.splity.model.auth.AuthLoginRequest
 import com.igorj.splity.model.auth.AuthRegisterRequest
 import com.igorj.splity.model.auth.AuthState
 import com.igorj.splity.model.auth.SignUpState
 import com.igorj.splity.model.main.errorResponse
+import com.igorj.splity.repository.UserInfoRepository
 import com.igorj.splity.util.LoadingController
 import com.igorj.splity.util.SnackbarConfig
 import com.igorj.splity.util.SnackbarController
@@ -20,7 +22,8 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val api: AuthApi,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val userInfoRepository: UserInfoRepository
 ): ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
@@ -35,10 +38,14 @@ class AuthViewModel(
     fun login(email: String, password: String) {
         viewModelScope.launch {
             LoadingController.showLoading()
+            userInfoRepository.clearUserInfo()
             val response = api.login(AuthLoginRequest(email, password))
             if (response.isSuccessful && response.body()?.token != null) {
                 val token = response.body()!!.token
+                val refreshToken = response.body()!!.refreshToken
+
                 tokenManager.saveToken(token)
+                tokenManager.saveRefreshToken(refreshToken)
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
                         message = "Login successful",
@@ -89,6 +96,30 @@ class AuthViewModel(
         }
     }
 
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            LoadingController.showLoading()
+            val response = api.userResetPassword(UserResetPasswordRequest(email))
+            if (response.isSuccessful) {
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = "Password reset email sent",
+                        config = SnackbarConfig(backgroundColor = Color.Green)
+                    )
+                )
+            } else {
+                val error = errorResponse(response.errorBody()?.string())
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = error.message,
+                        config = SnackbarConfig(backgroundColor = Color.Red)
+                    )
+                )
+            }
+            LoadingController.hideLoading()
+        }
+    }
+
 //    private fun validateRegistration(signUpState: SignUpState): Boolean {
 //        return signUpState.username.isNotBlank() &&
 //                isValidEmail(signUpState.email) &&
@@ -122,6 +153,8 @@ class AuthViewModel(
 
     fun logout() {
         tokenManager.clearToken()
+        tokenManager.clearRefreshToken()
+        userInfoRepository.clearUserInfo()
         _authState.value = AuthState.Initial
     }
 }

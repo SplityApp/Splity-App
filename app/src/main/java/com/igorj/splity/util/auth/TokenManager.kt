@@ -12,6 +12,19 @@ class TokenManager(private val sharedPreferences: SharedPreferences) {
     fun clearToken() {
         sharedPreferences.edit().remove(TOKEN_AUTH_KEY).apply()
     }
+
+    fun saveRefreshToken(token: String) {
+        sharedPreferences.edit().putString(TOKEN_REFRESH, token).apply()
+    }
+
+    fun getRefreshToken(): String? = sharedPreferences.getString(TOKEN_REFRESH, null)
+
+    fun clearRefreshToken() {
+        sharedPreferences.edit().remove(TOKEN_REFRESH).apply()
+    }
 }
 
 const val TOKEN_AUTH_KEY = "token_auth_key"
+const val TOKEN_REFRESH = "token_refresh"
+val TOKEN_REFRESH_ENDPOINTS = arrayOf("change-user-info")
+

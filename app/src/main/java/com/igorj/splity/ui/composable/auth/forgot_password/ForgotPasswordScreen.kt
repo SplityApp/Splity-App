@@ -23,7 +23,8 @@ import com.igorj.splity.ui.theme.localColorScheme
 @Composable
 fun ForgotPasswordScreen(
     modifier: Modifier = Modifier,
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onConfirm: (String) -> Unit = {},
 ) {
     var email by remember {
         mutableStateOf("")
@@ -59,7 +60,9 @@ fun ForgotPasswordScreen(
                 alternativeText = stringResource(id = R.string.forgotPasswordScreen_ui_bottomAlternativeText),
                 alternativeHighlightText = stringResource(id = R.string.forgotPasswordScreen_ui_bottomAlternativeHighlightText),
                 onConfirmClicked = {
-
+                    if (email.isNotEmpty()) {
+                        onConfirm(email)
+                    }
                 },
                 onAlternativeClicked = {
                     onNavigate(AuthNavigationScreen.SignIn.name)

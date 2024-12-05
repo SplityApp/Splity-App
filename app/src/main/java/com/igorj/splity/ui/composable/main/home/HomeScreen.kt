@@ -34,6 +34,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -74,7 +75,8 @@ fun HomeScreen(
     val isRefreshing by homeViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, { homeViewModel.refreshUserGroups() })
     val navController = rememberNavController()
-    val sheetState = rememberModalBottomSheetState()
+    val createGroupSheetState = rememberModalBottomSheetState()
+    val joinGroupSheetState = rememberModalBottomSheetState()
     var showCreateGroupModalBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
@@ -173,12 +175,16 @@ fun HomeScreen(
                                         mutableStateOf("")
                                     }
                                     var selectedCurrency by rememberSaveable {
-                                        mutableStateOf(Currency.getInstance(Locale.getDefault()))
+                                        mutableStateOf(Currency.getInstance(Locale.getDefault()).currencyCode)
+                                    }
+                                    val currencies = remember {
+                                        Currency.getAvailableCurrencies()
+                                            .sortedBy { it.currencyCode }
                                     }
 
                                     ModalBottomSheet(
                                         containerColor = localColorScheme.tertiaryContainer,
-                                        sheetState = sheetState,
+                                        sheetState = createGroupSheetState,
                                         onDismissRequest = {
                                             showCreateGroupModalBottomSheet = false
                                         },
@@ -215,10 +221,12 @@ fun HomeScreen(
                                                     keyboardType = KeyboardType.Text,
                                                 )
                                             )
-                                            CurrencyPicker(
+                                            DropdownPicker(
+                                                label = "Currency",
                                                 modifier = Modifier.fillMaxWidth(),
-                                                selectedCurrency = selectedCurrency,
-                                                onCurrencySelected = {
+                                                availableValues = currencies.map { it.currencyCode },
+                                                selectedValue = selectedCurrency,
+                                                onValueSelected = {
                                                     selectedCurrency = it
                                                 }
                                             )
@@ -229,7 +237,7 @@ fun HomeScreen(
                                                 onClick = {
                                                     homeViewModel.createGroup(
                                                         name,
-                                                        selectedCurrency
+                                                        Currency.getInstance(selectedCurrency)
                                                     )
                                                     showCreateGroupModalBottomSheet = false
                                                 },
@@ -256,7 +264,7 @@ fun HomeScreen(
 
                                     ModalBottomSheet(
                                         containerColor = localColorScheme.tertiaryContainer,
-                                        sheetState = sheetState,
+                                        sheetState = joinGroupSheetState,
                                         onDismissRequest = {
                                             showJoinGroupModalBottomSheet = false
                                         },

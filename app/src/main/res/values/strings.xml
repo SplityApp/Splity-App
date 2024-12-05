@@ -52,6 +52,12 @@
     <string name="joinGroupModalBottomSheet_ui_joinGroupTextFieldHint">Invite code</string>
     <string name="joinGroupModalBottomSheet_ui_joinGroupButtonLabel">Join</string>
 
+    <string name="newExpenseModalBottomSheet_ui_newExpenseTitle">New expense</string>
+    <string name="newExpenseModalBottomSheet_ui_paidByAndAmountSectionTitle">Paid by</string>
+    <string name="newExpenseModalBottomSheet_ui_newExpenseTextFieldHint">Expense name</string>
+    <string name="newExpenseModalBottomSheet_ui_newExpenseButtonLabel">Add</string>
+    <string name="newExpenseModalBottomSheet_ui_newExpenseSplitSectionTitle">Split</string>
+
     <string name="groupDetailsScreen_alt_inviteToGroupButton">Invite to group</string>
     <string name="groupDetailsScreen_alt_closeInviteToGroupDialog">Close invite code dialog</string>
     <string name="groupDetailsScreen_ui_inviteCodeDialogTitle">Invite code</string>
@@ -60,7 +66,13 @@
     <string name="groupDetailsScreen_ui_inviteCodeDialogDescription">Share this code with your friends to invite them to the group!</string>
     <string name="groupDetailsScreen_ui_screenSwitchButtonLeftLabel">Expenses</string>
     <string name="groupDetailsScreen_ui_screenSwitchButtonRightLabel">Balances</string>
+    <string name="groupDetailsScreen_alt_newExpenseButton">Add new expense</string>
 
     <string name="balanceScreen_ui_yourBalanceCardTitle">Your balance</string>
     <string name="balanceScreen_ui_balancesSectionLabel">Total balance</string>
+    <string name="profile_screen_ui_character_image">Character image</string>
+    <string name="profile_screen_ui_edit">Edit</string>
+    <string name="profile_screen_ui_logout">Logout</string>
+    <string name="profile_screen_ui_change_user_info">Change user info</string>
+    <string name="profile_screen_ui_save">Save</string>
 </resources>
