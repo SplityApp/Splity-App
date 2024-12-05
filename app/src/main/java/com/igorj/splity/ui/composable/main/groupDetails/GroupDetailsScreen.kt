@@ -399,12 +399,12 @@ fun GroupDetailsScreen(
                                 ) {
                                     Text(
                                         text = stringResource(R.string.groupDetailsScreen_ui_inviteCodeDialogTitle),
-                                        style = typography.labelMedium,
+                                        style = typography.displayMedium,
                                         color = localColorScheme.secondary
                                     )
                                     Text(
                                         text = state.groupDetails.inviteCode,
-                                        style = typography.labelLarge.copy(
+                                        style = typography.displayLarge.copy(
                                             letterSpacing = 4.sp
                                         ),
                                         color = localColorScheme.secondary
