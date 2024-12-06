@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.igorj.splity.AuthViewModel
+import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.model.main.BottomNavItem
 import com.igorj.splity.model.payment.PaymentParticipant
 import com.igorj.splity.ui.composable.main.home.HomeScreen
@@ -31,6 +32,7 @@ import java.util.Currency
 fun MainScreen(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = koinViewModel(),
+    profileViewModel: ProfileViewModel = koinViewModel(),
     onLogoutClicked: () -> Unit = {}
 ) {
     val navController = rememberNavController()
@@ -45,6 +47,7 @@ fun MainScreen(
 
     LaunchedEffect(true) {
         authViewModel.setFcmToken()
+        profileViewModel.loadUserInfo()
     }
 
     Scaffold(
