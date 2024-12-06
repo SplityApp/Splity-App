@@ -161,7 +161,7 @@ class AuthViewModel(
 //        return email.isNotBlank() && password.isNotBlank()
 //    }
 
-    private fun setFcmToken() {
+    fun setFcmToken() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val fcmToken = Firebase.messaging.token.await()
@@ -169,12 +169,12 @@ class AuthViewModel(
                 val response = fcmApi.setFcmToken(request)
 
                 if (response.isSuccessful) {
-                    Log.d("FCM", "Token successfully updated on server")
+                    Log.d("LOGCAT", "Token successfully updated on server")
                 } else {
-                    Log.e("FCM", "Failed to update token: ${response.code()}")
+                    Log.e("LOGCAT", "Failed to update token: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("FCM", "Error updating token", e)
+                Log.e("LOGCAT", "Error updating token", e)
             }
         }
     }

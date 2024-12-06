@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.igorj.splity.AuthViewModel
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.ExpenseApi
 import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
@@ -35,7 +36,7 @@ val appModule = module {
     }
 
     viewModel {
-        GroupDetailsViewModel(get())
+        GroupDetailsViewModel(get(), get())
     }
 
     viewModel {
@@ -92,6 +93,8 @@ val appModule = module {
     single { get<Retrofit>().create(ProfileApi::class.java) }
 
     single { get<Retrofit>().create(FcmApi::class.java) }
+
+    single { get<Retrofit>().create(ExpenseApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"

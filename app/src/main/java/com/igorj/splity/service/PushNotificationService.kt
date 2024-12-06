@@ -1,7 +1,10 @@
 package com.igorj.splity.service
 
+import android.app.NotificationManager
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.SetFcmTokenRequest
 import kotlinx.coroutines.CoroutineScope
@@ -23,13 +26,34 @@ class PushNotificationService: FirebaseMessagingService() {
                 val response = fcmApi.setFcmToken(request)
 
                 if (response.isSuccessful) {
-                    Log.d("FCM", "Token successfully updated on server")
+                    Log.d("LOGCAT PushNotificationService", "Token successfully updated on server")
                 } else {
-                    Log.e("FCM", "Failed to update token: ${response.code()}")
+                    Log.e("LOGCAT PushNotificationService", "Failed to update token: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("FCM", "Error updating token", e)
+                Log.e("LOGCAT PushNotificationService", "Error updating token", e)
             }
         }
+    }
+
+    override fun onMessageReceived(message: RemoteMessage) {
+        super.onMessageReceived(message)
+
+        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(message.notification?.title)
+            .setContentText(message.notification?.body)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(1, notification)
+
+        Log.d("LOGCAT", "Notification received")
+    }
+
+    companion object {
+        const val NOTIFICATION_CHANNEL_ID = "Splity"
     }
 }
