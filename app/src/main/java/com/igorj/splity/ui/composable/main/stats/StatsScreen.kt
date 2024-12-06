@@ -65,9 +65,9 @@ fun StatsScreen(
         filteredPayments.filter { it.date.monthValue == month }.sumOf { it.amount }
     }
 
-    val months = (monthsInRange.first - 1..monthsInRange.last).toList()
+    val months = (monthsInRange.first - 1..monthsInRange.last + 1).toList()
     val monthLabels = months.map { monthValue ->
-        if (monthValue == monthsInRange.first - 1) {
+        if (monthValue == monthsInRange.first - 1 || monthValue == monthsInRange.last + 1) {
             " "
         } else {
             LocalDate.of(2024, monthValue, 1).month.name.substring(0, 3)
@@ -233,10 +233,9 @@ fun DatePickerDialog(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     NumberPicker(
-                        title = "Day",
+                        title = "Year",
                         value = selectedYear,
                         onValueChange = { selectedYear = it },
                         range = 1980..2030
@@ -256,14 +255,20 @@ fun DatePickerDialog(
                     onDateChange(LocalDate.of(selectedYear, selectedMonth, selectedDay))
                 }
             ) {
-                Text("OK")
+                Text(
+                    "OK",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismissRequest
             ) {
-                Text("Cancel")
+                Text(
+                    "Cancel",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     )
@@ -277,7 +282,8 @@ fun NumberPicker(
     range: IntRange
 ) {
     Column(
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = title,
@@ -290,7 +296,7 @@ fun NumberPicker(
         ) {
             IconButton(
                 onClick = { onValueChange(value + 1) },
-                enabled = value > range.first
+                enabled = value < range.last
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowUpward,
@@ -304,7 +310,7 @@ fun NumberPicker(
             )
             IconButton(
                 onClick = { onValueChange(value - 1) },
-                enabled = value < range.last
+                enabled = value > range.first
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowDownward,
