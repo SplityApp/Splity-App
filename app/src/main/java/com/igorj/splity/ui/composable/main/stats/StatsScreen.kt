@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-data class Payment(
+private data class Payment(
     val date: LocalDate,
     val amount: Double
 )
@@ -89,7 +89,6 @@ fun StatsScreen(
             }
         }
         is StatsState.Success -> {
-            parseToDate("2024/1")
             val payments = state.stats.map { Payment(parseToDate(it.date), it.totalAmount) }
 
             val filteredPayments = remember(payments, startDate, endDate) {
@@ -148,6 +147,14 @@ fun StatsScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+                Text(
+                    text = "Monthly Expenses",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -172,14 +179,6 @@ fun StatsScreen(
                         .fillMaxWidth()
                         .height(300.dp),
                     barChartData = barChartData
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Monthly Payments",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
 
@@ -225,10 +224,7 @@ fun StatsScreen(
 }
 
 fun parseToDate(input: String): LocalDate {
-    // Define a formatter for the full date (year, month, and day)
     val formatter = DateTimeFormatter.ofPattern("yyyy/M/d")
-
-    // Append a default day to the input string and parse it
     return LocalDate.parse("$input/1", formatter)
 }
 
@@ -245,7 +241,7 @@ fun DatePicker(
         }
     ) {
         Text(
-            text = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+            text = date.format(DateTimeFormatter.ofPattern("MMM, yyyy")),
             style = MaterialTheme.typography.bodyMedium
         )
         Icon(
