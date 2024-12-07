@@ -1,11 +1,15 @@
 package com.igorj.splity.ui.composable.main.stats
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import co.yml.charts.axis.AxisConfig
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.barchart.BarChart
@@ -15,16 +19,17 @@ import com.igorj.splity.model.main.expense.ExpenseCategory
 import com.igorj.splity.model.main.stats.StatsBetweenDatesCategoryResponse
 
 @Composable
-fun CategoryExpensesChart(stats: List<StatsBetweenDatesCategoryResponse>) {
+fun CategoryExpensesChart(
+    stats: List<StatsBetweenDatesCategoryResponse>
+) {
     val categories = ExpenseCategory.entries.toTypedArray()
 
     val categoryAmounts = categories.associateWith { category ->
-        stats.firstOrNull { it.category == category.name }?.totalAmount ?: 0.0
+        stats.firstOrNull { it.category == category.title }?.totalAmount ?: 0.0
     }
 
     val categoryLabels = listOf(" ") + categories.map { it.emoji } + listOf(" ")
     val amounts = listOf(0.0) + categories.map { categoryAmounts[it] ?: 0.0 } + listOf(0.0)
-
     val maxAmount = (amounts.maxOrNull() ?: 0.0) * 1.2
 
     val barChartData = BarChartData(
@@ -36,6 +41,7 @@ fun CategoryExpensesChart(stats: List<StatsBetweenDatesCategoryResponse>) {
             )
         },
         backgroundColor = MaterialTheme.colorScheme.background,
+        paddingEnd = 0.dp,
         xAxisData = AxisData.Builder()
             .axisStepSize(10.dp)
             .steps(categoryLabels.size)
@@ -58,6 +64,7 @@ fun CategoryExpensesChart(stats: List<StatsBetweenDatesCategoryResponse>) {
     BarChart(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color.Transparent)
             .height(300.dp),
         barChartData = barChartData
     )

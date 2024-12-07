@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.yml.charts.axis.AxisData
@@ -25,29 +24,21 @@ fun MonthlyExpensesChart(
     startDate: LocalDate,
     endDate: LocalDate
 ) {
-    val filteredPayments = remember(payments, startDate, endDate) {
-        payments.filter { it.date.isAfter(startDate.minusDays(1)) && it.date.isBefore(endDate.plusDays(1)) }
-    }
+    val filteredPayments = payments.filter { it.date.isAfter(startDate.minusDays(1)) && it.date.isBefore(endDate.plusDays(1)) }
+    val (monthsInRange, monthLabels) = calculateMonthsInRange(startDate, endDate)
 
-    val monthsInRange = startDate.monthValue..endDate.monthValue
-    val groupedPayments = monthsInRange.associateWith { month ->
+    val monthsWithPadding = listOf(monthsInRange.first() - 1) + monthsInRange + listOf(monthsInRange.last() + 1)
+    val monthLabelsWithPadding = listOf(" ") + monthLabels + listOf(" ")
+
+    val groupedPayments = monthsWithPadding.associateWith { month ->
         filteredPayments.filter { it.date.monthValue == month }.sumOf { it.amount }
     }
 
-    val months = (monthsInRange.first - 1..monthsInRange.last + 1).toList()
-    val monthLabels = months.map { monthValue ->
-        if (monthValue == monthsInRange.first - 1 || monthValue == monthsInRange.last + 1) {
-            " "
-        } else {
-            LocalDate.of(2024, monthValue, 1).month.name.substring(0, 3)
-        }
-    }
-
-    val amounts = months.map { groupedPayments[it] ?: 0.0 }
+    val amounts = monthsWithPadding.map { groupedPayments[it] ?: 0.0 }
     val maxAmount = (amounts.maxOrNull() ?: 0.0) * 1.2
 
     val barChartData = BarChartData(
-        chartData = months.mapIndexed { index, _ ->
+        chartData = monthsWithPadding.mapIndexed { index, _ ->
             BarData(
                 point = Point(x = index.toFloat(), y = amounts[index].toFloat()),
                 label = "$${amounts[index]}",
@@ -55,16 +46,19 @@ fun MonthlyExpensesChart(
             )
         },
         backgroundColor = MaterialTheme.colorScheme.background,
+        paddingEnd = 0.dp,
         xAxisData = AxisData.Builder()
             .axisStepSize(10.dp)
-            .steps(months.size)
-            .labelData { index -> monthLabels[index] }
+            .steps(monthsWithPadding.size)
+            .bottomPadding(40.dp)
+            .labelData { index -> monthLabelsWithPadding[index] }
             .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .backgroundColor(MaterialTheme.colorScheme.background)
             .build(),
         yAxisData = AxisData.Builder()
             .steps(5)
+            .labelAndAxisLinePadding(40.dp)
             .labelData { index -> ((index * maxAmount / 5).toInt()).toString() }
             .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
@@ -78,4 +72,20 @@ fun MonthlyExpensesChart(
             .height(300.dp),
         barChartData = barChartData
     )
+}
+
+
+fun calculateMonthsInRange(startDate: LocalDate, endDate: LocalDate): Pair<List<Int>, List<String>> {
+    val months = generateSequence(startDate) { it.plusMonths(1) }
+        .takeWhile { it <= endDate }
+        .map { it.monthValue }
+        .toList()
+
+    val monthsWithPadding = listOf(months.first() - 1) + months + listOf(months.last() + 1)
+    val labels = monthsWithPadding.map { monthValue ->
+        if (monthValue < 1 || monthValue > 12) " "
+        else LocalDate.of(2024, monthValue, 1).month.name.substring(0, 3)
+    }
+
+    return monthsWithPadding to labels
 }
