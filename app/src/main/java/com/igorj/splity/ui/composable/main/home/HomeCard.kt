@@ -1,5 +1,6 @@
 package com.igorj.splity.ui.composable.main.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.igorj.splity.ui.theme.DarkGreen
@@ -29,12 +32,10 @@ fun HomeCard(
     currency: String,
     onClick: () -> Unit
 ) {
-    val amountColor: Color = if (amount > 0) {
-        Green
-    } else if(amount == 0.0) {
-        LightGrey
-    } else {
-        Red
+    val amountColor: Color = when {
+        amount > 0 -> Green
+        amount == 0.0 -> LightGrey
+        else -> Red
     }
 
     val isAmountAnInt = amount == amount.toInt().toDouble()
@@ -49,25 +50,35 @@ fun HomeCard(
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 16.dp, horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(vertical = 16.dp, horizontal = 20.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
             Text(
                 text = title,
+                textAlign = TextAlign.Start,
                 style = typography.headlineMedium,
-                color = localColorScheme.secondary
+                color = localColorScheme.secondary,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
-
-            Spacer(modifier = Modifier.weight(1f))
 
             Text(
                 text = "${if (amount > 0) "+" else ""}${if (isAmountAnInt) amount.toInt() else "%.2f".format(amount)} $currency",
+                textAlign = TextAlign.End,
                 style = typography.headlineMedium,
-                color = amountColor
+                color = amountColor,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
+
 
 @Preview
 @Composable
