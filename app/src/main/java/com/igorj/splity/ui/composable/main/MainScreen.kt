@@ -62,34 +62,7 @@ fun MainScreen(
                     HomeScreen()
                 }
                 composable(BottomNavItem.Stats.route) {
-                    StatsScreen(
-                        payments = listOf(
-                            Payment(
-                                date = LocalDate.now(),
-                                amount = 100.00
-                            ),
-                            Payment(
-                                date = LocalDate.now().minusMonths(1),
-                                amount = 50.00
-                            ),
-                            Payment(
-                                date = LocalDate.now().minusMonths(2),
-                                amount = 200.00
-                            ),
-                            Payment(
-                                date = LocalDate.now().minusMonths(3),
-                                amount = 150.00
-                            ),
-                            Payment(
-                                date = LocalDate.now().minusMonths(4),
-                                amount = 300.00
-                            ),
-                        ),
-                        initialStartDate = LocalDate.now().minusMonths(4),
-                        initialEndDate = LocalDate.now(),
-                        onStartDateChange = {},
-                        onEndDateChange = {}
-                    )
+                    StatsScreen()
                 }
                 composable(BottomNavItem.Profile.route) {
                     ProfileScreen(
