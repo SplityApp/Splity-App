@@ -24,7 +24,7 @@ fun AuthTopBar(modifier: Modifier = Modifier) {
         Text(
             modifier = Modifier.padding(vertical = 4.dp),
             text = stringResource(id = R.string.app_name),
-            style = typography.labelSmall,
+            style = typography.displaySmall,
             color = localColorScheme.primary,
             letterSpacing = 4.sp
         )

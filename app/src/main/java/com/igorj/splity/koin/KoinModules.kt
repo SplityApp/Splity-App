@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import com.igorj.splity.AuthViewModel
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.ExpenseApi
+import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
 import com.igorj.splity.api.ProfileApi
@@ -28,7 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
     viewModel {
-        AuthViewModel(get(), get(), get())
+        AuthViewModel(get(), get(), get(), get())
     }
 
     viewModel {
@@ -36,7 +38,7 @@ val appModule = module {
     }
 
     viewModel {
-        GroupDetailsViewModel(get())
+        GroupDetailsViewModel(get(), get())
     }
 
     viewModel {
@@ -44,7 +46,7 @@ val appModule = module {
     }
 
     viewModel {
-        BalancesViewModel(get())
+        BalancesViewModel(get(), get())
     }
 
     viewModel {
@@ -97,6 +99,10 @@ val appModule = module {
     single { get<Retrofit>().create(ProfileApi::class.java) }
 
     single { get<Retrofit>().create(StatsApi::class.java) }
+
+    single { get<Retrofit>().create(FcmApi::class.java) }
+
+    single { get<Retrofit>().create(ExpenseApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"

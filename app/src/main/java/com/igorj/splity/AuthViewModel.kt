@@ -1,9 +1,14 @@
 package com.igorj.splity
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.igorj.splity.api.AuthApi
+import com.igorj.splity.api.FcmApi
+import com.igorj.splity.api.SetFcmTokenRequest
 import com.igorj.splity.api.UserResetPasswordRequest
 import com.igorj.splity.model.auth.AuthLoginRequest
 import com.igorj.splity.model.auth.AuthRegisterRequest
@@ -16,12 +21,16 @@ import com.igorj.splity.util.SnackbarConfig
 import com.igorj.splity.util.SnackbarController
 import com.igorj.splity.util.SnackbarEvent
 import com.igorj.splity.util.auth.TokenManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel(
     private val api: AuthApi,
+    private val fcmApi: FcmApi,
     private val tokenManager: TokenManager,
     private val userInfoRepository: UserInfoRepository
 ): ViewModel() {
@@ -52,6 +61,7 @@ class AuthViewModel(
                         config = SnackbarConfig(backgroundColor = Color.Green)
                     )
                 )
+                setFcmToken()
                 _authState.value = AuthState.Authenticated
             } else {
                 val error = errorResponse(response.errorBody()?.string())
@@ -150,6 +160,24 @@ class AuthViewModel(
 //    private fun validateLogin(email: String, password: String): Boolean {
 //        return email.isNotBlank() && password.isNotBlank()
 //    }
+
+    fun setFcmToken() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fcmToken = Firebase.messaging.token.await()
+                val request = SetFcmTokenRequest(fcmToken = fcmToken)
+                val response = fcmApi.setFcmToken(request)
+
+                if (response.isSuccessful) {
+                    Log.d("LOGCAT", "Token successfully updated on server")
+                } else {
+                    Log.e("LOGCAT", "Failed to update token: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("LOGCAT", "Error updating token", e)
+            }
+        }
+    }
 
     fun logout() {
         tokenManager.clearToken()

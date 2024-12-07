@@ -1,7 +1,11 @@
 package com.igorj.splity
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import com.igorj.splity.koin.appModule
+import com.igorj.splity.service.PushNotificationService
 import com.tpay.sdk.api.models.CertificatePinningConfiguration
 import com.tpay.sdk.api.models.Environment
 import com.tpay.sdk.api.models.Language
@@ -23,6 +27,7 @@ class MainApplication : Application() {
         }
 
         configureTpay()
+        createNotificationChannel()
     }
 
     private fun configureTpay() {
@@ -79,5 +84,17 @@ class MainApplication : Application() {
                 PaymentMethod.Pbl,
             )
         )
+    }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            PushNotificationService.NOTIFICATION_CHANNEL_ID,
+            "Payments",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        channel.description = "Used to notify about recent payments"
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 }

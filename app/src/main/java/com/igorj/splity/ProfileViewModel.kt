@@ -32,7 +32,7 @@ class ProfileViewModel(
         loadUserInfo()
     }
 
-    private fun loadUserInfo() {
+    fun loadUserInfo() {
         viewModelScope.launch {
             try {
                 userInfoRepository.getUserInfo()?.let { cachedUserInfo ->
