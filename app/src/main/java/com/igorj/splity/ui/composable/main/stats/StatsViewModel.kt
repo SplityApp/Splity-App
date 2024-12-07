@@ -1,11 +1,11 @@
 package com.igorj.splity.ui.composable.main.stats
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.StatsApi
 import com.igorj.splity.api.StatsBetweenDatesRequest
-import com.igorj.splity.model.main.stats.StatsState
+import com.igorj.splity.model.main.stats.StatsCategoryState
+import com.igorj.splity.model.main.stats.StatsMonthlyState
 import com.igorj.splity.util.LoadingController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -13,18 +13,34 @@ import kotlinx.coroutines.launch
 class StatsViewModel(
     private val statsApi: StatsApi
 ): ViewModel() {
-    private val _stats = MutableStateFlow<StatsState>(StatsState.Loading)
-    val stats = _stats
+    private val _monthlyStats = MutableStateFlow<StatsMonthlyState>(StatsMonthlyState.Loading)
+    val monthlyStats = _monthlyStats
 
-    fun getStats(startDate: String, endDate: String) {
+    private val _categoryStats = MutableStateFlow<StatsCategoryState>(StatsCategoryState.Loading)
+    val categoryStats = _categoryStats
+
+    fun getMonthlyStats(startDate: String, endDate: String) {
         viewModelScope.launch {
             LoadingController.showLoading()
             try {
                 val response = statsApi.getStatsBetweenDates(StatsBetweenDatesRequest(startDate, endDate))
-                _stats.value = StatsState.Success(response)
+                _monthlyStats.value = StatsMonthlyState.Success(response)
             } catch (e: Exception) {
-                Log.e("StatsViewModel", "An error occurred", e)
-                _stats.value = StatsState.Error(e.message ?: "An error occurred")
+                _monthlyStats.value = StatsMonthlyState.Error(e.message ?: "An error occurred")
+            } finally {
+                LoadingController.hideLoading()
+            }
+        }
+    }
+
+    fun getCategoryStats(startDate: String, endDate: String) {
+        viewModelScope.launch {
+            try {
+                LoadingController.showLoading()
+                val response = statsApi.getStatsBetweenDatesByCategory(StatsBetweenDatesRequest(startDate, endDate))
+                _categoryStats.value = StatsCategoryState.Success(response)
+            } catch (e: Exception) {
+                _categoryStats.value = StatsCategoryState.Error(e.message ?: "An error occurred")
             } finally {
                 LoadingController.hideLoading()
             }

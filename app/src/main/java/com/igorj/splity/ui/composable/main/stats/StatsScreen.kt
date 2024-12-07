@@ -33,23 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import co.yml.charts.axis.AxisData
-import co.yml.charts.common.model.Point
-import co.yml.charts.ui.barchart.BarChart
-import co.yml.charts.ui.barchart.models.BarChartData
-import co.yml.charts.ui.barchart.models.BarData
-import com.igorj.splity.model.main.stats.StatsState
+import com.igorj.splity.model.main.stats.StatsCategoryState
+import com.igorj.splity.model.main.stats.StatsMonthlyState
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import com.igorj.splity.util.LoadingController
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-private data class Payment(
-    val date: LocalDate,
-    val amount: Double
-)
 
 @Composable
 fun StatsScreen(
@@ -58,170 +49,199 @@ fun StatsScreen(
     val initialStartDate: LocalDate = LocalDate.now().minusMonths(6)
     val initialEndDate: LocalDate = LocalDate.now()
 
-    val onStartDateChange: (LocalDate) -> Unit = { startDate ->
-        statsViewModel.getStats(startDate.toString(), initialEndDate.toString())
-    }
-    val onEndDateChange: (LocalDate) -> Unit = { endDate ->
-        statsViewModel.getStats(initialStartDate.toString(), endDate.toString())
-    }
+    var startDateMonthly by remember { mutableStateOf(initialStartDate) }
+    var endDateMonthly by remember { mutableStateOf(initialEndDate) }
+    var isStartDatePickerVisibleMonthly by remember { mutableStateOf(false) }
+    var isEndDatePickerVisibleMonthly by remember { mutableStateOf(false) }
+
+    var startDateCategory by remember { mutableStateOf(initialStartDate) }
+    var endDateCategory by remember { mutableStateOf(initialEndDate) }
+    var isStartDatePickerVisibleCategory by remember { mutableStateOf(false) }
+    var isEndDatePickerVisibleCategory by remember { mutableStateOf(false) }
+
+    val statsScreenState by statsViewModel.monthlyStats.collectAsStateWithLifecycle()
+    val categoryStatsState by statsViewModel.categoryStats.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
-        statsViewModel.getStats(initialStartDate.toString(), initialEndDate.toString())
+        statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
+        statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
     }
 
-    val statsScreenState by statsViewModel.stats.collectAsStateWithLifecycle()
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Monthly Expenses",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
-    var startDate by remember { mutableStateOf(initialStartDate) }
-    var endDate by remember { mutableStateOf(initialEndDate) }
-    var isStartDatePickerVisible by remember { mutableStateOf(false) }
-    var isEndDatePickerVisible by remember { mutableStateOf(false) }
+        Spacer(modifier = Modifier.height(8.dp))
 
-    when(val state = statsScreenState) {
-        StatsState.Loading -> {
-            LaunchedEffect(true) {
-                LoadingController.showLoading()
-            }
-
-            DisposableEffect(true) {
-                onDispose {
-                    LoadingController.hideLoading()
-                }
-            }
-        }
-        is StatsState.Success -> {
-            val payments = state.stats.map { Payment(parseToDate(it.date), it.totalAmount) }
-
-            val filteredPayments = remember(payments, startDate, endDate) {
-                payments.filter { it.date.isAfter(startDate.minusDays(1)) && it.date.isBefore(endDate.plusDays(1)) }
-            }
-
-            val monthsInRange = startDate.monthValue..endDate.monthValue
-            val groupedPayments = monthsInRange.associateWith { month ->
-                filteredPayments.filter { it.date.monthValue == month }.sumOf { it.amount }
-            }
-
-            val months = (monthsInRange.first - 1..monthsInRange.last + 1).toList()
-            val monthLabels = months.map { monthValue ->
-                if (monthValue == monthsInRange.first - 1 || monthValue == monthsInRange.last + 1) {
-                    " "
-                } else {
-                    LocalDate.of(2024, monthValue, 1).month.name.substring(0, 3)
-                }
-            }
-
-            val amounts = months.map { groupedPayments[it] ?: 0.0 }
-
-            val maxAmount = (amounts.maxOrNull() ?: 0.0) * 1.2
-
-            val barChartData = BarChartData(
-                chartData = months.mapIndexed { index, _ ->
-                    BarData(
-                        point = Point(x = index.toFloat(), y = amounts[index].toFloat()),
-                        label = "$${amounts[index]}",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                backgroundColor = MaterialTheme.colorScheme.background,
-                xAxisData = AxisData.Builder()
-                    .axisStepSize(10.dp)
-                    .steps(months.size)
-                    .bottomPadding(40.dp)
-                    .labelData { index -> monthLabels[index] }
-                    .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
-                    .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
-                    .backgroundColor(MaterialTheme.colorScheme.background)
-                    .build(),
-                yAxisData = AxisData.Builder()
-                    .steps(5)
-                    .labelAndAxisLinePadding(40.dp)
-                    .labelData { index -> ((index * maxAmount / 5).toInt()).toString() }
-                    .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
-                    .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
-                    .backgroundColor(MaterialTheme.colorScheme.background)
-                    .build()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DatePicker(
+                date = startDateMonthly,
+                isPickerVisible = isStartDatePickerVisibleMonthly,
+                onPickerVisibilityChange = { isStartDatePickerVisibleMonthly = it }
             )
+            DatePicker(
+                date = endDateMonthly,
+                isPickerVisible = isEndDatePickerVisibleMonthly,
+                onPickerVisibilityChange = { isEndDatePickerVisibleMonthly = it }
+            )
+        }
 
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Monthly Expenses",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+        Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    DatePicker(
-                        date = startDate,
-                        isPickerVisible = isStartDatePickerVisible,
-                        onPickerVisibilityChange = { isStartDatePickerVisible = it }
-                    )
-                    DatePicker(
-                        date = endDate,
-                        isPickerVisible = isEndDatePickerVisible,
-                        onPickerVisibilityChange = { isEndDatePickerVisible = it }
-                    )
+        when (val state = statsScreenState) {
+            StatsMonthlyState.Loading -> {
+                LaunchedEffect(true) {
+                    LoadingController.showLoading()
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                BarChart(
+                DisposableEffect(true) {
+                    onDispose {
+                        LoadingController.hideLoading()
+                    }
+                }
+            }
+            is StatsMonthlyState.Success -> {
+                val payments = state.stats.map { Payment(parseToDate(it.date), it.totalAmount) }
+                MonthlyExpensesChart(payments = payments, startDate = startDateMonthly, endDate = endDateMonthly)
+            }
+            is StatsMonthlyState.Error -> {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    barChartData = barChartData
-                )
-            }
-
-            if (isStartDatePickerVisible) {
-                DatePickerDialog(
-                    date = startDate,
-                    onDateChange = {
-                        startDate = it
-                        onStartDateChange(it)
-                        isStartDatePickerVisible = false
-                    },
-                    onDismissRequest = { isStartDatePickerVisible = false }
-                )
-            }
-
-            if (isEndDatePickerVisible) {
-                DatePickerDialog(
-                    date = endDate,
-                    onDateChange = {
-                        endDate = it
-                        onEndDateChange(it)
-                        isEndDatePickerVisible = false
-                    },
-                    onDismissRequest = { isEndDatePickerVisible = false }
-                )
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = state.message,
+                        style = typography.headlineMedium,
+                        color = localColorScheme.secondary
+                    )
+                }
             }
         }
-        is StatsState.Error -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = state.message,
-                    style = typography.headlineMedium,
-                    color = localColorScheme.secondary
-                )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Category Expenses",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DatePicker(
+                date = startDateCategory,
+                isPickerVisible = isStartDatePickerVisibleCategory,
+                onPickerVisibilityChange = { isStartDatePickerVisibleCategory = it }
+            )
+            DatePicker(
+                date = endDateCategory,
+                isPickerVisible = isEndDatePickerVisibleCategory,
+                onPickerVisibilityChange = { isEndDatePickerVisibleCategory = it }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (val state = categoryStatsState) {
+            StatsCategoryState.Loading -> {
+                LaunchedEffect(true) {
+                    LoadingController.showLoading()
+                }
+
+                DisposableEffect(true) {
+                    onDispose {
+                        LoadingController.hideLoading()
+                    }
+                }
+            }
+            is StatsCategoryState.Success -> {
+                CategoryExpensesChart(stats = state.stats)
+            }
+            is StatsCategoryState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = state.message,
+                        style = typography.headlineMedium,
+                        color = localColorScheme.secondary
+                    )
+                }
             }
         }
+    }
+
+    if (isStartDatePickerVisibleMonthly) {
+        DatePickerDialog(
+            date = startDateMonthly,
+            onDateChange = {
+                startDateMonthly = it
+                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
+                isStartDatePickerVisibleMonthly = false
+            },
+            onDismissRequest = { isStartDatePickerVisibleMonthly = false }
+        )
+    }
+
+    if (isEndDatePickerVisibleMonthly) {
+        DatePickerDialog(
+            date = endDateMonthly,
+            onDateChange = {
+                endDateMonthly = it
+                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
+                isEndDatePickerVisibleMonthly = false
+            },
+            onDismissRequest = { isEndDatePickerVisibleMonthly = false }
+        )
+    }
+
+    if (isStartDatePickerVisibleCategory) {
+        DatePickerDialog(
+            date = startDateCategory,
+            onDateChange = {
+                startDateCategory = it
+                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
+                isStartDatePickerVisibleCategory = false
+            },
+            onDismissRequest = { isStartDatePickerVisibleCategory = false }
+        )
+    }
+
+    if (isEndDatePickerVisibleCategory) {
+        DatePickerDialog(
+            date = endDateCategory,
+            onDateChange = {
+                endDateCategory = it
+                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
+                isEndDatePickerVisibleCategory = false
+            },
+            onDismissRequest = { isEndDatePickerVisibleCategory = false }
+        )
     }
 }
+
 
 fun parseToDate(input: String): LocalDate {
     val formatter = DateTimeFormatter.ofPattern("yyyy/M/d")
@@ -260,11 +280,9 @@ fun DatePickerDialog(
 ) {
     val year = date.year
     val month = date.monthValue
-    val day = date.dayOfMonth
 
     var selectedYear by remember { mutableStateOf(year) }
     var selectedMonth by remember { mutableStateOf(month) }
-    var selectedDay by remember { mutableStateOf(day) }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -299,7 +317,7 @@ fun DatePickerDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onDateChange(LocalDate.of(selectedYear, selectedMonth, selectedDay))
+                    onDateChange(LocalDate.of(selectedYear, selectedMonth, 1))
                 }
             ) {
                 Text(
