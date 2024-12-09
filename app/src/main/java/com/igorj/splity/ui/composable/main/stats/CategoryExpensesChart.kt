@@ -18,7 +18,8 @@ import com.igorj.splity.model.main.stats.StatsBetweenDatesCategoryResponse
 
 @Composable
 fun CategoryExpensesChart(
-    stats: List<StatsBetweenDatesCategoryResponse>
+    stats: List<StatsBetweenDatesCategoryResponse>,
+    currency: String?
 ) {
     val categories = ExpenseCategory.entries.toTypedArray()
 
@@ -34,7 +35,7 @@ fun CategoryExpensesChart(
         chartData = amounts.mapIndexed { index, amount ->
             BarData(
                 point = Point(x = index.toFloat(), y = amount.toFloat()),
-                label = if (index == 0 || index == amounts.lastIndex) "" else "$${amount}",
+                label = if (index == 0 || index == amounts.lastIndex) "" else "${currency ?: ""}${amounts[index]}",
                 color = MaterialTheme.colorScheme.primary
             )
         },
@@ -52,7 +53,7 @@ fun CategoryExpensesChart(
         yAxisData = AxisData.Builder()
             .steps(5)
             .labelAndAxisLinePadding(40.dp)
-            .labelData { index -> ((index * maxAmount / 5).toInt()).toString() }
+            .labelData { index -> "${currency ?: ""} ${(index * maxAmount / 5).toInt()}" }
             .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .backgroundColor(MaterialTheme.colorScheme.background)

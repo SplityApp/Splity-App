@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,9 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.model.main.stats.StatsCategoryState
+import com.igorj.splity.model.main.stats.StatsCurrenciesState
 import com.igorj.splity.model.main.stats.StatsMonthlyState
-import com.igorj.splity.ui.theme.localColorScheme
-import com.igorj.splity.ui.theme.typography
 import com.igorj.splity.util.LoadingController
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -61,10 +63,18 @@ fun StatsScreen(
 
     val statsScreenState by statsViewModel.monthlyStats.collectAsStateWithLifecycle()
     val categoryStatsState by statsViewModel.categoryStats.collectAsStateWithLifecycle()
+    val currenciesState by statsViewModel.currencies.collectAsStateWithLifecycle()
 
-    LaunchedEffect(true) {
-        statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
-        statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
+    var selectedCurrency by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        statsViewModel.getCurrencies(initialStartDate.toString(), initialEndDate.toString())
+    }
+
+    LaunchedEffect(currenciesState) {
+        if (currenciesState is StatsCurrenciesState.Success) {
+            selectedCurrency = (currenciesState as StatsCurrenciesState.Success).currencies.firstOrNull()
+        }
     }
 
     Column(
@@ -73,110 +83,153 @@ fun StatsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Monthly Expenses",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            DatePicker(
-                date = startDateMonthly,
-                isPickerVisible = isStartDatePickerVisibleMonthly,
-                onPickerVisibilityChange = { isStartDatePickerVisibleMonthly = it }
-            )
-            DatePicker(
-                date = endDateMonthly,
-                isPickerVisible = isEndDatePickerVisibleMonthly,
-                onPickerVisibilityChange = { isEndDatePickerVisibleMonthly = it }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        when (val state = statsScreenState) {
-            StatsMonthlyState.Loading -> {
-                LaunchedEffect(true) {
-                    LoadingController.showLoading()
-                }
-
+        when(val state = currenciesState) {
+            StatsCurrenciesState.Loading -> {
+                LoadingController.showLoading()
                 DisposableEffect(true) {
-                    onDispose {
-                        LoadingController.hideLoading()
-                    }
+                    onDispose { LoadingController.hideLoading() }
                 }
             }
-            is StatsMonthlyState.Success -> {
-                val payments = state.stats.map { Payment(parseToDate(it.date), it.totalAmount) }
-                MonthlyExpensesChart(payments = payments, startDate = startDateMonthly, endDate = endDateMonthly)
-            }
-            is StatsMonthlyState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+            is StatsCurrenciesState.Success -> {
+                val currencies = state.currencies
+                if (selectedCurrency == null && currencies.isNotEmpty()) {
+                    selectedCurrency = currencies.first()
+                }
+
+                Row {
                     Text(
-                        text = state.message,
-                        style = typography.headlineMedium,
-                        color = localColorScheme.secondary
+                        text = "Selected Currency: ",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+
+                    DropdownSelector(
+                        options = currencies,
+                        selectedOption = selectedCurrency,
+                        onOptionSelected = { currency ->
+                            selectedCurrency = currency
+                            statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString(), currency)
+                            statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString(), currency)
+                        }
                     )
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+                when(val monthlyState = statsScreenState) {
+                    StatsMonthlyState.Loading -> {
+                        LoadingController.showLoading()
+                        DisposableEffect(true) {
+                            onDispose { LoadingController.hideLoading() }
+                        }
+                    }
+                    is StatsMonthlyState.Success -> {
+                        val payments = monthlyState.stats.map { Payment(parseToDate(it.date), it.totalAmount) }
+                        Text(
+                            text = "Monthly Expenses (${selectedCurrency ?: "Loading..."})",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
 
-        Text(
-            text = "Category Expenses",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+                        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            DatePicker(
+                                date = startDateMonthly,
+                                isPickerVisible = isStartDatePickerVisibleMonthly,
+                                onPickerVisibilityChange = { isStartDatePickerVisibleMonthly = it }
+                            )
+                            DatePicker(
+                                date = endDateMonthly,
+                                isPickerVisible = isEndDatePickerVisibleMonthly,
+                                onPickerVisibilityChange = { isEndDatePickerVisibleMonthly = it }
+                            )
+                        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            DatePicker(
-                date = startDateCategory,
-                isPickerVisible = isStartDatePickerVisibleCategory,
-                onPickerVisibilityChange = { isStartDatePickerVisibleCategory = it }
-            )
-            DatePicker(
-                date = endDateCategory,
-                isPickerVisible = isEndDatePickerVisibleCategory,
-                onPickerVisibilityChange = { isEndDatePickerVisibleCategory = it }
-            )
-        }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        when (val state = categoryStatsState) {
-            StatsCategoryState.Loading -> {
-                LaunchedEffect(true) {
-                    LoadingController.showLoading()
+                        MonthlyExpensesChart(
+                            payments = payments,
+                            startDate = startDateMonthly,
+                            endDate = endDateMonthly,
+                            currency = selectedCurrency
+                        )
+                    }
+                    is StatsMonthlyState.Error -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = monthlyState.message,
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
                 }
 
-                DisposableEffect(true) {
-                    onDispose {
-                        LoadingController.hideLoading()
+                when (val categoryState = categoryStatsState) {
+                    StatsCategoryState.Loading -> {
+                        LoadingController.showLoading()
+                        DisposableEffect(true) {
+                            onDispose { LoadingController.hideLoading() }
+                        }
+                    }
+                    is StatsCategoryState.Success -> {
+                        Text(
+                            text = "Category Expenses (${selectedCurrency ?: "Loading..."})",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            DatePicker(
+                                date = startDateCategory,
+                                isPickerVisible = isStartDatePickerVisibleCategory,
+                                onPickerVisibilityChange = { isStartDatePickerVisibleCategory = it }
+                            )
+                            DatePicker(
+                                date = endDateCategory,
+                                isPickerVisible = isEndDatePickerVisibleCategory,
+                                onPickerVisibilityChange = { isEndDatePickerVisibleCategory = it }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        CategoryExpensesChart(
+                            stats = categoryState.stats,
+                            currency = selectedCurrency
+                        )
+                    }
+                    is StatsCategoryState.Error -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = categoryState.message,
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }
-            is StatsCategoryState.Success -> {
-                CategoryExpensesChart(stats = state.stats)
-            }
-            is StatsCategoryState.Error -> {
+            is StatsCurrenciesState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -185,8 +238,8 @@ fun StatsScreen(
                 ) {
                     Text(
                         text = state.message,
-                        style = typography.headlineMedium,
-                        color = localColorScheme.secondary
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -198,7 +251,7 @@ fun StatsScreen(
             date = startDateMonthly,
             onDateChange = {
                 startDateMonthly = it
-                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
+                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString(), selectedCurrency ?: "")
                 isStartDatePickerVisibleMonthly = false
             },
             onDismissRequest = { isStartDatePickerVisibleMonthly = false }
@@ -210,7 +263,7 @@ fun StatsScreen(
             date = endDateMonthly,
             onDateChange = {
                 endDateMonthly = it
-                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString())
+                statsViewModel.getMonthlyStats(startDateMonthly.toString(), endDateMonthly.toString(), selectedCurrency ?: "")
                 isEndDatePickerVisibleMonthly = false
             },
             onDismissRequest = { isEndDatePickerVisibleMonthly = false }
@@ -222,7 +275,7 @@ fun StatsScreen(
             date = startDateCategory,
             onDateChange = {
                 startDateCategory = it
-                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
+                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString(), selectedCurrency ?: "")
                 isStartDatePickerVisibleCategory = false
             },
             onDismissRequest = { isStartDatePickerVisibleCategory = false }
@@ -234,7 +287,7 @@ fun StatsScreen(
             date = endDateCategory,
             onDateChange = {
                 endDateCategory = it
-                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString())
+                statsViewModel.getCategoryStats(startDateCategory.toString(), endDateCategory.toString(), selectedCurrency ?: "")
                 isEndDatePickerVisibleCategory = false
             },
             onDismissRequest = { isEndDatePickerVisibleCategory = false }
@@ -246,6 +299,47 @@ fun StatsScreen(
 fun parseToDate(input: String): LocalDate {
     val formatter = DateTimeFormatter.ofPattern("yyyy/M/d")
     return LocalDate.parse("$input/1", formatter)
+}
+
+@Composable
+fun DropdownSelector(
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        Text(
+            text = selectedOption ?: "Select Currency",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable { expanded = true }
+                .padding(12.dp)
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { currency ->
+                DropdownMenuItem(
+                    text = { Text(currency) },
+                    onClick = {
+                        expanded = false
+                        onOptionSelected(currency)
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -317,7 +411,7 @@ fun DatePickerDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onDateChange(LocalDate.of(selectedYear, selectedMonth, 1))
+                    onDateChange(LocalDate.of(selectedYear, selectedMonth, LocalDate.now().dayOfMonth))
                 }
             ) {
                 Text(

@@ -22,7 +22,8 @@ data class Payment(
 fun MonthlyExpensesChart(
     payments: List<Payment>,
     startDate: LocalDate,
-    endDate: LocalDate
+    endDate: LocalDate,
+    currency: String?
 ) {
     val filteredPayments = payments.filter { it.date.isAfter(startDate.minusDays(1)) && it.date.isBefore(endDate.plusDays(1)) }
     val (monthsInRange, monthLabels) = calculateMonthsInRange(startDate, endDate)
@@ -41,8 +42,8 @@ fun MonthlyExpensesChart(
         chartData = monthsWithPadding.mapIndexed { index, _ ->
             BarData(
                 point = Point(x = index.toFloat(), y = amounts[index].toFloat()),
-                label = "$${amounts[index]}",
-                color = MaterialTheme.colorScheme.primary,
+                label = if (index == 0 || index == amounts.lastIndex) "" else "${currency ?: ""}${amounts[index]}",
+                color = MaterialTheme.colorScheme.primary
             )
         },
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -59,7 +60,7 @@ fun MonthlyExpensesChart(
         yAxisData = AxisData.Builder()
             .steps(5)
             .labelAndAxisLinePadding(40.dp)
-            .labelData { index -> ((index * maxAmount / 5).toInt()).toString() }
+            .labelData { index -> "${currency ?: ""} ${(index * maxAmount / 5).toInt()}" }
             .axisLineColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
             .backgroundColor(MaterialTheme.colorScheme.background)
@@ -73,7 +74,6 @@ fun MonthlyExpensesChart(
         barChartData = barChartData
     )
 }
-
 
 fun calculateMonthsInRange(startDate: LocalDate, endDate: LocalDate): Pair<List<Int>, List<String>> {
     val months = generateSequence(startDate) { it.plusMonths(1) }
