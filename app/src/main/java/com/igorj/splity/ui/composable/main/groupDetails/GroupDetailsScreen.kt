@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.R
 import com.igorj.splity.model.main.groupDetails.GroupDetailsState
 import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesScreen
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpensesScreen
 import com.igorj.splity.ui.composable.main.groupDetails.expense.NewExpenseBottomSheet
 import com.igorj.splity.ui.theme.localColorScheme
@@ -63,6 +64,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun GroupDetailsScreen(
     groupDetailsViewModel: GroupDetailsViewModel = koinViewModel(),
+    expenseViewModel: ExpenseViewModel = koinViewModel(),
     groupId: String
 ) {
     val clipboardManager = LocalClipboardManager.current
@@ -180,7 +182,7 @@ fun GroupDetailsScreen(
                                 showNewExpenseModalBottomSheet = false
                             },
                             onAddExpense = {
-                                groupDetailsViewModel.addExpense(it)
+                                expenseViewModel.addExpense(it)
                             }
                         )
                     }

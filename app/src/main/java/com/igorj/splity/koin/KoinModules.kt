@@ -38,11 +38,11 @@ val appModule = module {
     }
 
     viewModel {
-        GroupDetailsViewModel(get(), get())
+        GroupDetailsViewModel(get())
     }
 
     viewModel {
-        ExpenseViewModel(get())
+        ExpenseViewModel(get(), get())
     }
 
     viewModel {

@@ -19,8 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.igorj.splity.model.main.expense.ExpenseEvent
 import com.igorj.splity.model.main.expense.ExpenseState
-import com.igorj.splity.model.main.groupDetails.GroupDetailsState
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
@@ -37,6 +37,16 @@ fun ExpensesScreen(
 ) {
     LaunchedEffect(true) {
         expenseViewModel.getExpenses(groupId)
+    }
+
+    LaunchedEffect(true) {
+        expenseViewModel.events.collect { event ->
+            when (event) {
+                ExpenseEvent.ExpenseAdded -> {
+                    expenseViewModel.getExpenses(groupId)
+                }
+            }
+        }
     }
 
     val expenseState by expenseViewModel.expenses.collectAsStateWithLifecycle()

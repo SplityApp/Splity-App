@@ -26,7 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.R
 import com.igorj.splity.model.main.balance.BalanceState
+import com.igorj.splity.model.main.expense.ExpenseEvent
 import com.igorj.splity.model.main.profile.UserInfoState
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.home.HomeCard
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
@@ -44,11 +46,22 @@ import org.koin.androidx.compose.koinViewModel
 fun BalancesScreen(
     balancesViewModel: BalancesViewModel = koinViewModel(),
     profileViewModel: ProfileViewModel = koinViewModel(),
+    expenseViewModel: ExpenseViewModel = koinViewModel(),
     groupId: String,
     currency: String
 ) {
     LaunchedEffect(true) {
         balancesViewModel.getBalances(groupId)
+    }
+
+    LaunchedEffect(true) {
+        expenseViewModel.events.collect { event ->
+            when (event) {
+                ExpenseEvent.ExpenseAdded -> {
+                    balancesViewModel.getBalances(groupId)
+                }
+            }
+        }
     }
 
     val context = LocalContext.current as? FragmentActivity ?: run {
