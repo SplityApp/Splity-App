@@ -51,6 +51,7 @@ class HomeViewModel(
                 )
             )
             if (response.isSuccessful && response.body() != null) {
+                refreshUserGroups()
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
                         message = "Group created",
