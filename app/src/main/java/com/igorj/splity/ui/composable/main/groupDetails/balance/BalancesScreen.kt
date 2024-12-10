@@ -108,6 +108,9 @@ fun BalancesScreen(
                                             amount = balance.balance,
                                             currency = currency,
                                             onClick = {  // TODO Move all of this to separate function
+                                                if (balance.balance <= 0.0) {
+                                                    return@HomeCard
+                                                }
                                                 LoadingController.showLoading()
 
                                                 val userInfo = profileViewModel.userInfoState.value
@@ -124,7 +127,7 @@ fun BalancesScreen(
 
                                                 val paymentSheet = Payment.Sheet(
                                                     transaction = SingleTransaction(
-                                                        amount = 50.0,
+                                                        amount = balance.balance,
                                                         description = description,
                                                         payerContext = PayerContext(
                                                             payer = Payer(
