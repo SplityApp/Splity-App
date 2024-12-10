@@ -46,87 +46,117 @@ class AuthViewModel(
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            LoadingController.showLoading()
-            userInfoRepository.clearUserInfo()
-            val response = api.login(AuthLoginRequest(email, password))
-            if (response.isSuccessful && response.body()?.token != null) {
-                val token = response.body()!!.token
-                val refreshToken = response.body()!!.refreshToken
+            try {
+                LoadingController.showLoading()
+                userInfoRepository.clearUserInfo()
+                val response = api.login(AuthLoginRequest(email, password))
+                if (response.isSuccessful && response.body()?.token != null) {
+                    val token = response.body()!!.token
+                    val refreshToken = response.body()!!.refreshToken
 
-                tokenManager.saveToken(token)
-                tokenManager.saveRefreshToken(refreshToken)
-                SnackbarController.showSnackbar(
-                    SnackbarEvent(
-                        message = "Login successful",
-                        config = SnackbarConfig(backgroundColor = Color.Green)
+                    tokenManager.saveToken(token)
+                    tokenManager.saveRefreshToken(refreshToken)
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = "Login successful",
+                            config = SnackbarConfig(backgroundColor = Color.Green)
+                        )
                     )
-                )
-                setFcmToken()
-                _authState.value = AuthState.Authenticated
-            } else {
-                val error = errorResponse(response.errorBody()?.string())
+                    setFcmToken()
+                    _authState.value = AuthState.Authenticated
+                } else {
+                    val error = errorResponse(response.errorBody()?.string())
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = error.message,
+                            config = SnackbarConfig(backgroundColor = Color.Red)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
-                        message = error.message,
+                        message = e.message ?: "An error occurred",
                         config = SnackbarConfig(backgroundColor = Color.Red)
                     )
                 )
+            } finally {
+                LoadingController.hideLoading()
             }
-            LoadingController.hideLoading()
         }
     }
 
     fun register(signUpState: SignUpState) {
         viewModelScope.launch {
-            LoadingController.showLoading()
-            val request = AuthRegisterRequest(
-                email = signUpState.email,
-                password = signUpState.password,
-                username = signUpState.username,
-                phoneNumber = signUpState.phoneNumber
-            )
-            val response = api.register(request)
-            if (response.isSuccessful) {
-                SnackbarController.showSnackbar(
-                    SnackbarEvent(
-                        message = "Registration successful",
-                        config = SnackbarConfig(backgroundColor = Color.Green)
-                    )
+            try {
+                LoadingController.showLoading()
+                val request = AuthRegisterRequest(
+                    email = signUpState.email,
+                    password = signUpState.password,
+                    username = signUpState.username,
+                    phoneNumber = signUpState.phoneNumber
                 )
-            } else {
-                val error = errorResponse(response.errorBody()?.string())
+                val response = api.register(request)
+                if (response.isSuccessful) {
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = "Registration successful",
+                            config = SnackbarConfig(backgroundColor = Color.Green)
+                        )
+                    )
+                } else {
+                    val error = errorResponse(response.errorBody()?.string())
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = error.message,
+                            config = SnackbarConfig(backgroundColor = Color.Red)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
-                        message = error.message,
+                        message = e.message ?: "An error occurred",
                         config = SnackbarConfig(backgroundColor = Color.Red)
                     )
                 )
+            } finally {
+                LoadingController.hideLoading()
             }
-            LoadingController.hideLoading()
         }
     }
 
     fun resetPassword(email: String) {
         viewModelScope.launch {
-            LoadingController.showLoading()
-            val response = api.userResetPassword(UserResetPasswordRequest(email))
-            if (response.isSuccessful) {
-                SnackbarController.showSnackbar(
-                    SnackbarEvent(
-                        message = "Password reset email sent",
-                        config = SnackbarConfig(backgroundColor = Color.Green)
+            try {
+                LoadingController.showLoading()
+                val response = api.userResetPassword(UserResetPasswordRequest(email))
+                if (response.isSuccessful) {
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = "Password reset email sent",
+                            config = SnackbarConfig(backgroundColor = Color.Green)
+                        )
                     )
-                )
-            } else {
-                val error = errorResponse(response.errorBody()?.string())
+                } else {
+                    val error = errorResponse(response.errorBody()?.string())
+                    SnackbarController.showSnackbar(
+                        SnackbarEvent(
+                            message = error.message,
+                            config = SnackbarConfig(backgroundColor = Color.Red)
+                        )
+                    )
+                }
+            } catch (e: Exception) {
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
-                        message = error.message,
+                        message = e.message ?: "An error occurred",
                         config = SnackbarConfig(backgroundColor = Color.Red)
                     )
                 )
+            } finally {
+                LoadingController.hideLoading()
             }
-            LoadingController.hideLoading()
         }
     }
 

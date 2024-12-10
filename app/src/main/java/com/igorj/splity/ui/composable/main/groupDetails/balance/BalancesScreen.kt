@@ -26,7 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.R
 import com.igorj.splity.model.main.balance.BalanceState
+import com.igorj.splity.model.main.expense.ExpenseEvent
 import com.igorj.splity.model.main.profile.UserInfoState
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.home.HomeCard
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
@@ -44,11 +46,22 @@ import org.koin.androidx.compose.koinViewModel
 fun BalancesScreen(
     balancesViewModel: BalancesViewModel = koinViewModel(),
     profileViewModel: ProfileViewModel = koinViewModel(),
+    expenseViewModel: ExpenseViewModel = koinViewModel(),
     groupId: String,
     currency: String
 ) {
     LaunchedEffect(true) {
         balancesViewModel.getBalances(groupId)
+    }
+
+    LaunchedEffect(true) {
+        expenseViewModel.events.collect { event ->
+            when (event) {
+                ExpenseEvent.ExpenseAdded -> {
+                    balancesViewModel.getBalances(groupId)
+                }
+            }
+        }
     }
 
     val context = LocalContext.current as? FragmentActivity ?: run {
@@ -108,6 +121,9 @@ fun BalancesScreen(
                                             amount = balance.balance,
                                             currency = currency,
                                             onClick = {  // TODO Move all of this to separate function
+                                                if (balance.balance <= 0.0) {
+                                                    return@HomeCard
+                                                }
                                                 LoadingController.showLoading()
 
                                                 val userInfo = profileViewModel.userInfoState.value
@@ -124,7 +140,7 @@ fun BalancesScreen(
 
                                                 val paymentSheet = Payment.Sheet(
                                                     transaction = SingleTransaction(
-                                                        amount = 50.0,
+                                                        amount = balance.balance,
                                                         description = description,
                                                         payerContext = PayerContext(
                                                             payer = Payer(

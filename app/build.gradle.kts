@@ -99,6 +99,9 @@ dependencies {
     // Tpay
     implementation("com.tpay:sdk:1.2.1")
 
+    // YCharts
+    implementation("co.yml:ycharts:2.1.0")
+
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-messaging")
