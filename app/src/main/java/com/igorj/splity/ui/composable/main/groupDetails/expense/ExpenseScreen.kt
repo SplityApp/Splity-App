@@ -70,7 +70,6 @@ fun ExpensesScreen(
                                 val date = Date(expense.createdAt.time)
                                 SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(date)
                             }
-                            .toSortedMap(reverseOrder())
 
                         LazyColumn(
                             modifier = Modifier.fillMaxSize()
