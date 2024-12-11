@@ -28,11 +28,16 @@ import androidx.compose.ui.unit.dp
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 
+data class DropdownPickerData(
+    val leadingIcon: String? = null,
+    val text: String,
+)
+
 @Composable
 fun DropdownPicker(
     label: String,
     menuWidth: Dp = 120.dp,
-    availableValues: List<String>,
+    availableValues: List<DropdownPickerData>,
     selectedValue: String,
     onValueSelected: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -73,16 +78,19 @@ fun DropdownPicker(
         ) {
             availableValues.forEach { value ->
                 DropdownMenuItem(
+                    leadingIcon = {
+                        Text(text = value.leadingIcon ?: "")
+                    },
                     text = {
                         Text(
-                            text = value,
+                            text = value.text,
                             style = typography.bodyMedium,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1
                         )
                     },
                     onClick = {
-                        onValueSelected(value)
+                        onValueSelected(value.text)
                         expanded = false
                     }
                 )

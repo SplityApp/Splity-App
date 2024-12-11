@@ -41,6 +41,7 @@ import com.igorj.splity.ui.composable.main.groupDetails.NewExpenseSplitMethodPic
 import com.igorj.splity.ui.composable.main.groupDetails.NewExpenseSplitUserCard
 import com.igorj.splity.ui.composable.main.groupDetails.SplitMethod
 import com.igorj.splity.ui.composable.main.home.DropdownPicker
+import com.igorj.splity.ui.composable.main.home.DropdownPickerData
 import com.igorj.splity.ui.theme.Red
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
@@ -122,8 +123,10 @@ fun NewExpenseBottomSheet(
                 DropdownPicker(
                     label = "Category",
                     menuWidth = 200.dp,
-                    availableValues = ExpenseCategory.entries.map { it.title },
-                    selectedValue = selectedCategory.title,
+                    availableValues = ExpenseCategory.entries.map {
+                        DropdownPickerData(text = it.title, leadingIcon = it.emoji)
+                    }.filter { it.text.isNotEmpty() },
+                    selectedValue = "${selectedCategory.emoji}  " + selectedCategory.title,
                     onValueSelected = {
                         selectedCategory = ExpenseCategory.entries.first { category ->
                             category.title == it
@@ -140,8 +143,8 @@ fun NewExpenseBottomSheet(
 
                 DropdownPicker(
                     label = "Paid by",
-                    availableValues = users.map { it.username },
-                    selectedValue = selectedPaidBy.username,
+                    availableValues = users.map { DropdownPickerData(text = it.username, leadingIcon = it.charImage) },
+                    selectedValue = "${selectedPaidBy.charImage}  " + selectedPaidBy.username,
                     onValueSelected = {
                         selectedPaidBy = users.first { user ->
                             user.username == it

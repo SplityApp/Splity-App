@@ -224,7 +224,7 @@ fun HomeScreen(
                                             DropdownPicker(
                                                 label = "Currency",
                                                 modifier = Modifier.fillMaxWidth(),
-                                                availableValues = currencies.map { it.currencyCode },
+                                                availableValues = currencies.map { DropdownPickerData(text = it.currencyCode) },
                                                 selectedValue = selectedCurrency,
                                                 onValueSelected = {
                                                     selectedCurrency = it
