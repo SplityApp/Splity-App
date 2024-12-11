@@ -86,43 +86,44 @@ class AuthViewModel(
         }
     }
 
-    fun register(signUpState: SignUpState) {
-        viewModelScope.launch {
-            try {
-                LoadingController.showLoading()
-                val request = AuthRegisterRequest(
-                    email = signUpState.email,
-                    password = signUpState.password,
-                    username = signUpState.username,
-                    phoneNumber = signUpState.phoneNumber
-                )
-                val response = api.register(request)
-                if (response.isSuccessful) {
-                    SnackbarController.showSnackbar(
-                        SnackbarEvent(
-                            message = "Registration successful",
-                            config = SnackbarConfig(backgroundColor = Color.Green)
-                        )
-                    )
-                } else {
-                    val error = errorResponse(response.errorBody()?.string())
-                    SnackbarController.showSnackbar(
-                        SnackbarEvent(
-                            message = error.message,
-                            config = SnackbarConfig(backgroundColor = Color.Red)
-                        )
-                    )
-                }
-            } catch (e: Exception) {
+    suspend fun register(signUpState: SignUpState): Result<Unit> {
+        return try {
+            LoadingController.showLoading()
+            val request = AuthRegisterRequest(
+                email = signUpState.email,
+                password = signUpState.password,
+                username = signUpState.username,
+                phoneNumber = signUpState.phoneNumber
+            )
+            val response = api.register(request)
+            if (response.isSuccessful) {
                 SnackbarController.showSnackbar(
                     SnackbarEvent(
-                        message = e.message ?: "An error occurred",
+                        message = "Registration successful",
+                        config = SnackbarConfig(backgroundColor = Color.Green)
+                    )
+                )
+                Result.success(Unit)
+            } else {
+                val error = errorResponse(response.errorBody()?.string())
+                SnackbarController.showSnackbar(
+                    SnackbarEvent(
+                        message = error.message,
                         config = SnackbarConfig(backgroundColor = Color.Red)
                     )
                 )
-            } finally {
-                LoadingController.hideLoading()
+                Result.failure(Exception(error.message))
             }
+        } catch (e: Exception) {
+            SnackbarController.showSnackbar(
+                SnackbarEvent(
+                    message = e.message ?: "An error occurred",
+                    config = SnackbarConfig(backgroundColor = Color.Red)
+                )
+            )
+            Result.failure(e)
+        } finally {
+            LoadingController.hideLoading()
         }
     }
 

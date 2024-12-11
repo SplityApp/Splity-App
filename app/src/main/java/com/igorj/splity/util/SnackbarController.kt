@@ -15,8 +15,9 @@ object SnackbarController {
     val snackbarEvents = _snackbarEvents.receiveAsFlow()
 
     suspend fun showSnackbar(event: SnackbarEvent) {
-        _snackbarColors.value = event.config
-        _snackbarEvents.send(event)
+        val closableEvent = event.copy(action = SnackbarAction("OK") {})
+        _snackbarColors.value = closableEvent.config
+        _snackbarEvents.send(closableEvent)
     }
 }
 
