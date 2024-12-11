@@ -9,6 +9,7 @@ import com.igorj.splity.api.ExpenseApi
 import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
+import com.igorj.splity.api.ProcessPaymentApi
 import com.igorj.splity.api.ProfileApi
 import com.igorj.splity.api.StatsApi
 import com.igorj.splity.repository.UserInfoRepository
@@ -46,7 +47,7 @@ val appModule = module {
     }
 
     viewModel {
-        BalancesViewModel(get(), get())
+        BalancesViewModel(get(), get(), get())
     }
 
     viewModel {
@@ -103,6 +104,8 @@ val appModule = module {
     single { get<Retrofit>().create(FcmApi::class.java) }
 
     single { get<Retrofit>().create(ExpenseApi::class.java) }
+
+    single { get<Retrofit>().create(ProcessPaymentApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"

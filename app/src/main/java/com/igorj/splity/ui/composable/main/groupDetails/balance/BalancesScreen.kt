@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.R
 import com.igorj.splity.model.main.balance.BalanceState
@@ -39,6 +40,7 @@ import com.tpay.sdk.api.models.payer.Payer
 import com.tpay.sdk.api.models.transaction.SingleTransaction
 import com.tpay.sdk.api.payment.Payment
 import com.tpay.sdk.api.payment.PaymentDelegate
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -167,13 +169,21 @@ fun BalancesScreen(
                                                     }
 
                                                     override fun onPaymentCompleted(transactionId: String?) {
-                                                        LoadingController.hideLoading()
-                                                        balancesViewModel.sendPushNotification(
-                                                            balance.id,
-                                                            "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
-                                                            "Check your balance"
-                                                        )
-                                                        Log.d("Payment", "Payment completed: $transactionId")
+                                                        balancesViewModel.viewModelScope.launch {
+                                                            val result = balancesViewModel.processPayment(
+                                                                groupId,
+                                                                balance.id,
+                                                                balance.balance
+                                                            )
+                                                            if (result) {
+                                                                balancesViewModel.sendPushNotification(
+                                                                    balance.id,
+                                                                    "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
+                                                                    "Check your balance"
+                                                                )
+                                                            }
+                                                            LoadingController.hideLoading()
+                                                        }
                                                     }
 
                                                     override fun onPaymentCancelled(transactionId: String?) {
