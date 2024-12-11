@@ -23,10 +23,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.R
 import com.igorj.splity.model.main.balance.BalanceState
+import com.igorj.splity.model.main.expense.ExpenseEvent
 import com.igorj.splity.model.main.profile.UserInfoState
+import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.home.HomeCard
 import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
@@ -37,6 +40,7 @@ import com.tpay.sdk.api.models.payer.Payer
 import com.tpay.sdk.api.models.transaction.SingleTransaction
 import com.tpay.sdk.api.payment.Payment
 import com.tpay.sdk.api.payment.PaymentDelegate
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -44,11 +48,22 @@ import org.koin.androidx.compose.koinViewModel
 fun BalancesScreen(
     balancesViewModel: BalancesViewModel = koinViewModel(),
     profileViewModel: ProfileViewModel = koinViewModel(),
+    expenseViewModel: ExpenseViewModel = koinViewModel(),
     groupId: String,
     currency: String
 ) {
     LaunchedEffect(true) {
         balancesViewModel.getBalances(groupId)
+    }
+
+    LaunchedEffect(true) {
+        expenseViewModel.events.collect { event ->
+            when (event) {
+                ExpenseEvent.ExpenseAdded -> {
+                    balancesViewModel.getBalances(groupId)
+                }
+            }
+        }
     }
 
     val context = LocalContext.current as? FragmentActivity ?: run {
@@ -108,6 +123,9 @@ fun BalancesScreen(
                                             amount = balance.balance,
                                             currency = currency,
                                             onClick = {  // TODO Move all of this to separate function
+                                                if (balance.balance <= 0.0) {
+                                                    return@HomeCard
+                                                }
                                                 LoadingController.showLoading()
 
                                                 val userInfo = profileViewModel.userInfoState.value
@@ -124,7 +142,7 @@ fun BalancesScreen(
 
                                                 val paymentSheet = Payment.Sheet(
                                                     transaction = SingleTransaction(
-                                                        amount = 50.0,
+                                                        amount = balance.balance,
                                                         description = description,
                                                         payerContext = PayerContext(
                                                             payer = Payer(
@@ -151,13 +169,21 @@ fun BalancesScreen(
                                                     }
 
                                                     override fun onPaymentCompleted(transactionId: String?) {
-                                                        LoadingController.hideLoading()
-                                                        balancesViewModel.sendPushNotification(
-                                                            balance.id,
-                                                            "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
-                                                            "Check your balance"
-                                                        )
-                                                        Log.d("Payment", "Payment completed: $transactionId")
+                                                        balancesViewModel.viewModelScope.launch {
+                                                            val result = balancesViewModel.processPayment(
+                                                                groupId,
+                                                                balance.id,
+                                                                balance.balance
+                                                            )
+                                                            if (result) {
+                                                                balancesViewModel.sendPushNotification(
+                                                                    balance.id,
+                                                                    "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
+                                                                    "Check your balance"
+                                                                )
+                                                            }
+                                                            LoadingController.hideLoading()
+                                                        }
                                                     }
 
                                                     override fun onPaymentCancelled(transactionId: String?) {

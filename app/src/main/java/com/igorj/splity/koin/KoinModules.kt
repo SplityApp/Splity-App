@@ -9,12 +9,15 @@ import com.igorj.splity.api.ExpenseApi
 import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.GroupApi
 import com.igorj.splity.api.HomeApi
+import com.igorj.splity.api.ProcessPaymentApi
 import com.igorj.splity.api.ProfileApi
+import com.igorj.splity.api.StatsApi
 import com.igorj.splity.repository.UserInfoRepository
 import com.igorj.splity.ui.composable.main.groupDetails.GroupDetailsViewModel
 import com.igorj.splity.ui.composable.main.groupDetails.balance.BalancesViewModel
 import com.igorj.splity.ui.composable.main.groupDetails.expense.ExpenseViewModel
 import com.igorj.splity.ui.composable.main.home.HomeViewModel
+import com.igorj.splity.ui.composable.main.stats.StatsViewModel
 import com.igorj.splity.util.auth.AuthInterceptor
 import com.igorj.splity.util.auth.TokenManager
 import okhttp3.Interceptor
@@ -36,19 +39,23 @@ val appModule = module {
     }
 
     viewModel {
-        GroupDetailsViewModel(get(), get())
+        GroupDetailsViewModel(get())
     }
 
     viewModel {
-        ExpenseViewModel(get())
+        ExpenseViewModel(get(), get())
     }
 
     viewModel {
-        BalancesViewModel(get(), get())
+        BalancesViewModel(get(), get(), get())
     }
 
     viewModel {
         ProfileViewModel(get(), get())
+    }
+
+    viewModel {
+        StatsViewModel(get())
     }
 
     single<SharedPreferences>(named(TOKEN_MANAGER_SHARED_PREFERENCES)){
@@ -92,9 +99,13 @@ val appModule = module {
 
     single { get<Retrofit>().create(ProfileApi::class.java) }
 
+    single { get<Retrofit>().create(StatsApi::class.java) }
+
     single { get<Retrofit>().create(FcmApi::class.java) }
 
     single { get<Retrofit>().create(ExpenseApi::class.java) }
+
+    single { get<Retrofit>().create(ProcessPaymentApi::class.java) }
 }
 
 const val BASE_URL = "https://bajqihucgsmrbpagxhvv.supabase.co"

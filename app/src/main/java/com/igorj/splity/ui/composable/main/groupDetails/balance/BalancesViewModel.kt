@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.igorj.splity.api.FcmApi
 import com.igorj.splity.api.GetBalancesRequest
 import com.igorj.splity.api.GroupApi
+import com.igorj.splity.api.ProcessPaymentApi
+import com.igorj.splity.api.ProcessPaymentRequest
 import com.igorj.splity.api.PushNotificationRequest
 import com.igorj.splity.model.main.balance.BalanceState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class BalancesViewModel(
     private val groupApi: GroupApi,
-    private val fcmApi: FcmApi
+    private val fcmApi: FcmApi,
+    private val processPaymentApi: ProcessPaymentApi
 ): ViewModel() {
     private val _balances = MutableStateFlow<BalanceState>(BalanceState.Loading)
     val balances = _balances
@@ -30,6 +33,34 @@ class BalancesViewModel(
             } catch (e: Exception) {
                 _balances.value = BalanceState.Error(e.message ?: "An error occurred")
             }
+        }
+    }
+
+    suspend fun processPayment(
+        groupId: String,
+        receiverId: String,
+        amount: Double,
+    ): Boolean {
+        return try {
+            val response = processPaymentApi.processPayment(
+                ProcessPaymentRequest(
+                    groupId = groupId,
+                    receiverId = receiverId,
+                    amount = amount
+                )
+            )
+
+            if (response.isSuccessful) {
+                getBalances(groupId)
+                Log.d("BalancesViewModel", "Payment processed successfully")
+                true
+            } else {
+                Log.e("BalancesViewModel", "Failed to process payment: ${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("BalancesViewModel", "Error processing payment", e)
+            false
         }
     }
 
