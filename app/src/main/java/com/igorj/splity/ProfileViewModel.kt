@@ -1,11 +1,9 @@
 package com.igorj.splity
 
-import android.content.Context
-import android.widget.Toast
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.igorj.splity.api.ChangeNotificationsRequest
 import com.igorj.splity.api.ChangeUserInfoRequest
 import com.igorj.splity.api.ProfileApi
 import com.igorj.splity.model.main.profile.UserInfoState
@@ -25,8 +23,20 @@ class ProfileViewModel(
     private val _userInfoState = MutableStateFlow<UserInfoState>(UserInfoState.Loading)
     val userInfoState = _userInfoState.asStateFlow()
 
-    private val _isUpdatingPreferences = MutableStateFlow(false)
-    val isUpdatingPreferences = _isUpdatingPreferences.asStateFlow()
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeAt(0)
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if(!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+            visiblePermissionDialogQueue.add(permission)
+        }
+    }
 
     init {
         loadUserInfo()
@@ -74,39 +84,6 @@ class ProfileViewModel(
                 }
             } catch (e: Exception) {
                 _userInfoState.value = UserInfoState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
-
-    fun updateNotificationPreferences(context: Context, allowed: Boolean) {
-        viewModelScope.launch {
-            try {
-                _isUpdatingPreferences.value = true
-
-                val response = profileApi.updateNotificationPreferences(
-                    ChangeNotificationsRequest(allowed)
-                )
-
-                if (response.isSuccessful) {
-                    response.body()?.let { notificationsResponse ->
-                        val currentState = _userInfoState.value
-                        if (currentState is UserInfoState.Success) {
-                            val updatedUserInfo = currentState.userInfo.copy(
-                                allowedNotifications = notificationsResponse.allowedNotifications
-                            )
-                            userInfoRepository.saveUserInfo(updatedUserInfo)
-                            _userInfoState.value = UserInfoState.Success(updatedUserInfo)
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, "Failed to update preferences", Toast.LENGTH_SHORT).show()
-                    loadUserInfo()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Unknown error", Toast.LENGTH_SHORT).show()
-                loadUserInfo()
-            } finally {
-                _isUpdatingPreferences.value = false
             }
         }
     }

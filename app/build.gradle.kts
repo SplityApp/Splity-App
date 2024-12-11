@@ -105,4 +105,7 @@ dependencies {
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-messaging")
+
+    // LifecycleResumeEffect
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 }

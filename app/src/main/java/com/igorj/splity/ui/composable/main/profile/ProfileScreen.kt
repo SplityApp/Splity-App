@@ -1,6 +1,16 @@
 package com.igorj.splity.ui.composable.main.profile
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,6 +52,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.igorj.splity.ProfileViewModel
 import com.igorj.splity.R
 import com.igorj.splity.model.main.profile.NotificationsPreferencesSettingRow
@@ -52,6 +65,7 @@ import com.igorj.splity.ui.theme.localColorScheme
 import com.igorj.splity.ui.theme.typography
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -60,11 +74,46 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val userInfoState by profileViewModel.userInfoState.collectAsState()
-    val isUpdatingPreferences by profileViewModel.isUpdatingPreferences.collectAsState()
 
     var showChangeUserInfoModalBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
+
+    val dialogQueue = profileViewModel.visiblePermissionDialogQueue
+
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else true
+        )
+    }
+
+    LifecycleResumeEffect(Unit) {
+        hasNotificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else true
+
+        onPauseOrDispose {
+
+        }
+    }
+
+    val notificationsPermissionResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            profileViewModel.onPermissionResult(
+                permission = Manifest.permission.POST_NOTIFICATIONS,
+                isGranted = isGranted
+            )
+        }
+    )
 
     BoxWithConstraints(
         modifier = Modifier
@@ -130,11 +179,16 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         NotificationsPreferencesSettingRow(
-                            areNotificationsAllowed = state.userInfo.allowedNotifications,
-                            onNotificationsAllowedChanged = { allowed ->
-                                profileViewModel.updateNotificationPreferences(context, allowed)
+                            areNotificationsAllowed = hasNotificationPermission,
+                            onNotificationsAllowedChanged = { _ ->
+                                if (hasNotificationPermission) {
+                                    context.openAppSettings()
+                                } else {
+                                    notificationsPermissionResultLauncher.launch(
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    )
+                                }
                             },
-                            enabled = !isUpdatingPreferences
                         )
                     }
                     Button(
@@ -327,5 +381,24 @@ fun ProfileScreen(
                 }
             }
         }
+
+        dialogQueue
+            .reversed()
+            .forEach { _ ->
+                PermissionDialog(
+                    onDismiss = profileViewModel::dismissDialog,
+                    onGoToAppSettingsClick = {
+                        profileViewModel.dismissDialog()
+                        context.openAppSettings()
+                    }
+                )
+            }
     }
+}
+
+fun Context.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
 }

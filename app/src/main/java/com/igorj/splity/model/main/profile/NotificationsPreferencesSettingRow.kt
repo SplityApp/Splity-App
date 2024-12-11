@@ -19,7 +19,6 @@ fun NotificationsPreferencesSettingRow(
     modifier: Modifier = Modifier,
     areNotificationsAllowed: Boolean = false,
     onNotificationsAllowedChanged: (Boolean) -> Unit = {},
-    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier
@@ -41,7 +40,6 @@ fun NotificationsPreferencesSettingRow(
         Switch(
             checked = areNotificationsAllowed,
             onCheckedChange = onNotificationsAllowedChanged,
-            enabled = enabled
         )
     }
 }
