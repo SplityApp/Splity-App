@@ -24,7 +24,8 @@ object SnackbarController {
 data class SnackbarConfig(
     val backgroundColor: Color = Color.Gray,
     val textColor: Color = Color.White,
-    val duration: SnackbarDuration = SnackbarDuration.Short
+    val duration: SnackbarDuration = SnackbarDuration.Short,
+    val actionColor: Color = Color.Black
 )
 
 data class SnackbarEvent(

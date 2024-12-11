@@ -76,7 +76,8 @@ class MainActivity : FragmentActivity() {
                             Snackbar(
                                 snackbarData = snackbarData,
                                 containerColor = snackbarColor.value.backgroundColor,
-                                contentColor = snackbarColor.value.textColor
+                                contentColor = snackbarColor.value.textColor,
+                                actionColor = snackbarColor.value.actionColor
                             )
                         }
                     }
