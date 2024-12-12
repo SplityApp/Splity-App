@@ -95,126 +95,139 @@ fun BalancesScreen(
                     onClick = {}
                 )
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    backgroundColor = localColorScheme.background,
-                    topBar = {
+                if (state.balancesResponse.users.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
-                            text = stringResource(R.string.balanceScreen_ui_balancesSectionLabel),
-                            style = typography.headlineSmall,
+                            text = "No balances yet",
+                            style = typography.headlineMedium,
                             color = localColorScheme.secondary,
-                            modifier = Modifier.padding(16.dp)
                         )
-                    },
-                    content = { innerPadding ->
-                        Box(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxSize()
-                                .pullRefresh(pullRefreshState),
-                        ) {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize()
+                    }
+                } else {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        backgroundColor = localColorScheme.background,
+                        topBar = {
+                            Text(
+                                text = stringResource(R.string.balanceScreen_ui_balancesSectionLabel),
+                                style = typography.headlineSmall,
+                                color = localColorScheme.secondary,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        },
+                        content = { innerPadding ->
+                            Box(
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .fillMaxSize()
+                                    .pullRefresh(pullRefreshState),
                             ) {
-                                state.balancesResponse.users.forEach { balance ->
-                                    item {
-                                        HomeCard(
-                                            title = balance.name,
-                                            amount = balance.balance,
-                                            currency = currency,
-                                            onClick = {  // TODO Move all of this to separate function
-                                                if (balance.balance <= 0.0) {
-                                                    return@HomeCard
-                                                }
-                                                LoadingController.showLoading()
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    state.balancesResponse.users.forEach { balance ->
+                                        item {
+                                            HomeCard(
+                                                title = balance.name,
+                                                amount = balance.balance,
+                                                currency = currency,
+                                                onClick = {
+                                                    if (balance.balance <= 0.0) {
+                                                        return@HomeCard
+                                                    }
+                                                    LoadingController.showLoading()
 
-                                                val userInfo = profileViewModel.userInfoState.value
-                                                if (userInfo !is UserInfoState.Success) {
-                                                    LoadingController.hideLoading()
-                                                    return@HomeCard
-                                                }
+                                                    val userInfo = profileViewModel.userInfoState.value
+                                                    if (userInfo !is UserInfoState.Success) {
+                                                        LoadingController.hideLoading()
+                                                        return@HomeCard
+                                                    }
 
-                                                val description = buildString {
-                                                    append("From: ${userInfo.userInfo.id}, ")
-                                                    append("To: ${balance.id}, ")
-                                                    append("Amount: ${balance.balance}, ")
-                                                }
+                                                    val description = buildString {
+                                                        append("From: ${userInfo.userInfo.id}, ")
+                                                        append("To: ${balance.id}, ")
+                                                        append("Amount: ${balance.balance}, ")
+                                                    }
 
-                                                val paymentSheet = Payment.Sheet(
-                                                    transaction = SingleTransaction(
-                                                        amount = balance.balance,
-                                                        description = description,
-                                                        payerContext = PayerContext(
-                                                            payer = Payer(
-                                                                name = userInfo.userInfo.username,
-                                                                email = userInfo.userInfo.email,
-                                                                phone = userInfo.userInfo.phoneNumber,
-                                                                address = Payer.Address(
-                                                                    city = "Warszawa",
-                                                                    postalCode = "00-000",
-                                                                    countryCode = "PL",
-                                                                    address = "ul. Testowa 1"
+                                                    val paymentSheet = Payment.Sheet(
+                                                        transaction = SingleTransaction(
+                                                            amount = balance.balance,
+                                                            description = description,
+                                                            payerContext = PayerContext(
+                                                                payer = Payer(
+                                                                    name = userInfo.userInfo.username,
+                                                                    email = userInfo.userInfo.email,
+                                                                    phone = userInfo.userInfo.phoneNumber,
+                                                                    address = Payer.Address(
+                                                                        city = "Warszawa",
+                                                                        postalCode = "00-000",
+                                                                        countryCode = "PL",
+                                                                        address = "ul. Testowa 1"
+                                                                    )
                                                                 )
-                                                            )
+                                                            ),
+                                                            notifications = null
                                                         ),
-                                                        notifications = null
-                                                    ),
-                                                    activity = context,
-                                                    supportFragmentManager = context.supportFragmentManager
-                                                )
+                                                        activity = context,
+                                                        supportFragmentManager = context.supportFragmentManager
+                                                    )
 
-                                                paymentSheet.addObserver(object : PaymentDelegate {
-                                                    override fun onPaymentCreated(transactionId: String?) {
-                                                        Log.d("Payment", "Payment created: $transactionId")
-                                                    }
-
-                                                    override fun onPaymentCompleted(transactionId: String?) {
-                                                        balancesViewModel.viewModelScope.launch {
-                                                            val result = balancesViewModel.processPayment(
-                                                                groupId,
-                                                                balance.id,
-                                                                balance.balance
-                                                            )
-                                                            if (result) {
-                                                                balancesViewModel.sendPushNotification(
-                                                                    balance.id,
-                                                                    "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
-                                                                    "Check your balance"
-                                                                )
-                                                            }
-                                                            LoadingController.hideLoading()
+                                                    paymentSheet.addObserver(object : PaymentDelegate {
+                                                        override fun onPaymentCreated(transactionId: String?) {
+                                                            Log.d("Payment", "Payment created: $transactionId")
                                                         }
-                                                    }
 
-                                                    override fun onPaymentCancelled(transactionId: String?) {
+                                                        override fun onPaymentCompleted(transactionId: String?) {
+                                                            balancesViewModel.viewModelScope.launch {
+                                                                val result = balancesViewModel.processPayment(
+                                                                    groupId,
+                                                                    balance.id,
+                                                                    balance.balance
+                                                                )
+                                                                if (result) {
+                                                                    balancesViewModel.sendPushNotification(
+                                                                        balance.id,
+                                                                        "${userInfo.userInfo.username} sent you ${balance.balance} $currency",
+                                                                        "Check your balance"
+                                                                    )
+                                                                }
+                                                                LoadingController.hideLoading()
+                                                            }
+                                                        }
+
+                                                        override fun onPaymentCancelled(transactionId: String?) {
+                                                            LoadingController.hideLoading()
+                                                            Log.d("Payment", "Payment cancelled: $transactionId")
+                                                        }
+
+                                                        override fun onModuleClosed() {
+                                                            LoadingController.hideLoading()
+                                                            Log.d("Payment", "Payment module closed")
+                                                        }
+                                                    })
+
+                                                    val result = paymentSheet.present()
+                                                    if (result !is SheetOpenResult.Success) {
                                                         LoadingController.hideLoading()
-                                                        Log.d("Payment", "Payment cancelled: $transactionId")
+                                                        Log.e("Payment", "Failed to open payment module")
                                                     }
-
-                                                    override fun onModuleClosed() {
-                                                        LoadingController.hideLoading()
-                                                        Log.d("Payment", "Payment module closed")
-                                                    }
-                                                })
-
-                                                val result = paymentSheet.present()
-                                                if (result !is SheetOpenResult.Success) {
-                                                    LoadingController.hideLoading()
-                                                    Log.e("Payment", "Failed to open payment module")
                                                 }
-                                            }
-                                        )
+                                            )
+                                        }
                                     }
                                 }
+                                PullRefreshIndicator(
+                                    modifier = Modifier.align(Alignment.TopCenter),
+                                    refreshing = isRefreshing,
+                                    state = pullRefreshState
+                                )
                             }
-                            PullRefreshIndicator(
-                                modifier = Modifier.align(Alignment.TopCenter),
-                                refreshing = isRefreshing,
-                                state = pullRefreshState
-                            )
                         }
-                    }
-                )
+                    )
+                }
             }
         }
         is BalanceState.Error -> {

@@ -81,28 +81,41 @@ fun ExpensesScreen(
                                 SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(date)
                             }
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            groupedExpenses.forEach { (date, expensesForDate) ->
-                                item {
-                                    Text(
-                                        text = date,
-                                        style = typography.titleMedium,
-                                        color = localColorScheme.secondary,
-                                        modifier = Modifier.padding(
-                                            start = 16.dp,
-                                            top = 16.dp,
-                                            bottom = 8.dp
+                        if (groupedExpenses.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No expenses yet",
+                                    style = typography.headlineMedium,
+                                    color = localColorScheme.secondary
+                                )
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                groupedExpenses.forEach { (date, expensesForDate) ->
+                                    item {
+                                        Text(
+                                            text = date,
+                                            style = typography.titleMedium,
+                                            color = localColorScheme.secondary,
+                                            modifier = Modifier.padding(
+                                                start = 16.dp,
+                                                top = 16.dp,
+                                                bottom = 8.dp
+                                            )
                                         )
-                                    )
-                                }
+                                    }
 
-                                items(expensesForDate) { expense ->
-                                    ExpenseCard(
-                                        expense = expense,
-                                        currency = currency,
-                                    )
+                                    items(expensesForDate) { expense ->
+                                        ExpenseCard(
+                                            expense = expense,
+                                            currency = currency,
+                                        )
+                                    }
                                 }
                             }
                         }

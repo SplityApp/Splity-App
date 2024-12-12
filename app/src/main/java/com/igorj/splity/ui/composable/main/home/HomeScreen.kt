@@ -148,18 +148,31 @@ fun HomeScreen(
                                     .fillMaxSize()
                                     .pullRefresh(pullRefreshState),
                             ) {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    items(state.userGroups) { group ->
-                                        HomeCard(
-                                            title = group.name,
-                                            amount = group.myBalance,
-                                            currency = group.currency,
-                                            onClick = {
-                                                navController.navigate("groupDetails/${group.id}")
-                                            }
+                                if (state.userGroups.isEmpty()) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "No groups, join or create one",
+                                            style = typography.headlineMedium,
+                                            color = localColorScheme.secondary,
                                         )
+                                    }
+                                } else {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        items(state.userGroups) { group ->
+                                            HomeCard(
+                                                title = group.name,
+                                                amount = group.myBalance,
+                                                currency = group.currency,
+                                                onClick = {
+                                                    navController.navigate("groupDetails/${group.id}")
+                                                }
+                                            )
+                                        }
                                     }
                                 }
 
@@ -180,6 +193,7 @@ fun HomeScreen(
                                     val currencies = remember {
                                         Currency.getAvailableCurrencies()
                                             .sortedBy { it.currencyCode }
+                                            .filterCurrencies()
                                     }
 
                                     ModalBottomSheet(
@@ -358,6 +372,21 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+fun List<Currency>.filterCurrencies(): List<Currency> {
+    val allowedCurrencies = setOf(
+        "EUR",
+        "PLN",
+        "USD",
+        "GBP",
+        "JPY",
+        "CHF"
+    )
+
+    return filter { currency ->
+        currency.currencyCode in allowedCurrencies
     }
 }
 
